@@ -1,0 +1,32 @@
+#root {
+  margin: 0 auto;
+  text-align: center;
+  height: 100%;
+  width: 100%;
+}
+
+body{
+  font-family: 'Lexend Deca', sans-serif;
+}
+
+.ceviche-one-regular {
+  font-family: "Ceviche One", system-ui;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.lexend-deca {
+  font-family: "Lexend Deca", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 80;
+  font-style: normal;
+}
+
+
+
+
+.hero{
+  display: flex;
+  flex-direction: column;
+  background-image: url('/background.png');
+}

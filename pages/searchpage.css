@@ -1,0 +1,14 @@
+.search-page {
+    position: relative;
+    height: 100vh; /* Set the height of the search page to the height of the viewport */
+  }
+  
+  .content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 80%; /* Adjust the height to cover 1/3 of the page */
+    background: linear-gradient(to bottom, #181818, #963701); /* Brown to lighter orange gradient */
+  }
+  

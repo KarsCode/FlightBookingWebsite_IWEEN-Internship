@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Navigate } from 'react-router-dom';
-import API_URL from '../../config';
+import LOGIN_API_URL from '../../config';
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -14,11 +14,11 @@ const LoginForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default form submission behavior
-    console.log(API_URL)
+    console.log(LOGIN_API_URL);
     
     try {
       // Make API request
-      const response = await fetch(`${API_URL}`, {
+      const response = await fetch(LOGIN_API_URL, {
         method: 'POST',
       });
 

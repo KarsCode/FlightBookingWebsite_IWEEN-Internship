@@ -2,12 +2,12 @@ import { FaUser } from "react-icons/fa";
 
 const Header = () => {
   return (
-    <div className="flex font-bold items-start pl-2 pr-6 pt-4 lg:pt-0 lg:pr-2 lg:pl-[6rem]">
-      <a href="/" className="pr-4 sm:pr-0">
+    <div className="flex font-bold items-start pb-4 pl-2 pr-6 pt-4 sm:pt-0 sm:pr-5 sm:pl-[6rem]">
+      <a href="/" className="">
         <img src="/logo.png" width="150" height="50" alt="Logo" />
       </a>
 
-      <div className="flex items-center pr-2 ml-auto lg:pr-4">
+      <div className="flex items-left pr-2 ml-auto">
         {/* Bootstrap dropdown for small screens */}
         <div className="dropdown lg:hidden pt-[10px]">
           <button className="btn btn-secondary dropdown-toggle flex justify-center bg-black " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

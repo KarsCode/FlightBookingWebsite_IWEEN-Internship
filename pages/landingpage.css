@@ -1,0 +1,9 @@
+.gradient-bg {
+  position: relative;
+  background: 
+    linear-gradient(to bottom, #181818, #963701) no-repeat, /* Gradient for the first 250px */
+    #F2F2F2; /* Solid color for the rest of the element */
+  background-size: 100% 250px; /* Set the gradient to cover only 250px in height */
+  background-position: top; /* Position the gradient at the top */
+  height: 100%; /* Set the height of the element to 100vh (or any height you need) */
+}

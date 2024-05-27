@@ -15,22 +15,22 @@ const Navbar = ({ handleIconClick }) => {
   };
 
   return (
-    <div className="rounded-3xl w-1/3 h-[100px] flex justify-around items-center shadow-md bg-white font-semibold">
-      <div className={`flex flex-col items-center ${selectedIcon === 'flight' ? 'text-orange-500' : ''}`} onClick={() => handleIconClickInternal('flight')}>
+    <div className="rounded-3xl gap-6 p-2 sm:p-0 sm:gap-0 sm:w-1/3 h-[100px] flex justify-around items-center shadow-md bg-white font-semibold">
+      <div className={`flex flex-col items-center ${selectedIcon === 'flight' ? 'text-[#E0621A]' : ''}`} onClick={() => handleIconClickInternal('flight')}>
         <div>
           <PiAirplaneInFlight size={28} />
         </div>
         Flight
       </div>
 
-      <div className={`flex flex-col items-center ${selectedIcon === 'hotel' ? 'text-orange-500' : ''}`} onClick={() => handleIconClickInternal('hotel')}>
+      <div className={`flex flex-col items-center ${selectedIcon === 'hotel' ? 'text-[#E0621A]' : ''}`} onClick={() => handleIconClickInternal('hotel')}>
         <div>
           <LuBedDouble size={28} />
         </div>
         Hotel
       </div>
 
-      <div className={`flex flex-col items-center ${selectedIcon === 'bus' ? 'text-orange-500' : ''}`} onClick={() => handleIconClickInternal('bus')}>
+      <div className={`flex flex-col items-center ${selectedIcon === 'bus' ? 'text-[#E0621A]' : ''}`} onClick={() => handleIconClickInternal('bus')}>
         <div>
           <MdOutlineDirectionsBus size={28} />
         </div>

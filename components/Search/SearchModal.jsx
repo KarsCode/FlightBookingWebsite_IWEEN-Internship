@@ -2,10 +2,10 @@ import BusModal from "./BusModal"
 import FlightModal from "./FlightModal"
 
 // eslint-disable-next-line react/prop-types
-const SearchModal = ({selectedIcon}) => {
+const SearchModal = ({selectedIcon,onTripDataSelect}) => {
   return (
-    <div className=" relative flex  p-2 bg-white rounded-3xl">
-      {selectedIcon === 'flight' && <FlightModal/>} 
+    <div className="flex p-2 bg-white rounded-3xl">
+      {selectedIcon === 'flight' && <FlightModal onTripDataSelect={onTripDataSelect}/>} 
       {selectedIcon === 'bus' && <BusModal/>}
         
     </div>

@@ -10,10 +10,10 @@ const SearchOffers = () => {
 
   // Sample offer data array
   const offers = [
-    { category: 'Flights', title: 'LIVE NOW: Sale by Vistara!', description: 'Round-trip flights connecting Mumbai and Mauritius starting @ ₹54,600...', imageUrl: '../../public/flightimage.jpeg' },
-    { category: 'Flights', title: 'LIVE NOW: Sale by Vistara!', description: 'Round-trip flights connecting Mumbai and Mauritius starting @ ₹54,600...', imageUrl: '../../public/flightimage.jpeg' },
-    { category: 'Flights', title: 'LIVE NOW: Sale by Vistara!', description: 'Round-trip flights connecting Mumbai and Mauritius starting @ ₹54,600...', imageUrl: '../../public/flightimage.jpeg' },
-    { category: 'Flights', title: 'LIVE NOW: Sale by Vistara!', description: 'Round-trip flights connecting Mumbai and Mauritius starting @ ₹54,600...', imageUrl: '../../public/flightimage.jpeg' },
+    { category: 'Flights', title: 'LIVE NOW: Sale by Vistara!', description: 'Round-trip flights connecting Mumbai and Mauritius starting @ ₹54,600...', imageUrl: '/flightimage.jpeg' },
+    { category: 'Flights', title: 'LIVE NOW: Sale by Vistara!', description: 'Round-trip flights connecting Mumbai and Mauritius starting @ ₹54,600...', imageUrl: '/flightimage.jpeg' },
+    { category: 'Flights', title: 'LIVE NOW: Sale by Vistara!', description: 'Round-trip flights connecting Mumbai and Mauritius starting @ ₹54,600...', imageUrl: '/flightimage.jpeg' },
+    { category: 'Flights', title: 'LIVE NOW: Sale by Vistara!', description: 'Round-trip flights connecting Mumbai and Mauritius starting @ ₹54,600...', imageUrl: '/flightimage.jpeg' },
     { category: 'Hotels', title: 'Special Offer: Luxury Staycation', description: 'Book a deluxe room and get 20% off on your stay!' },
     // Add more offer objects here as needed
   ];

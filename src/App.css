@@ -7,6 +7,7 @@
 
 body{
   font-family: 'Lexend Deca', sans-serif;
+  height: calc(100vh-100px);
 }
 
 .ceviche-one-regular {

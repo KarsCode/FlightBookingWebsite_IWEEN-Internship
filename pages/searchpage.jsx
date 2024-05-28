@@ -5,7 +5,6 @@ import Navbar from '../components/Search/Navbar';
 import SearchModal from '../components/Search/SearchModal'
 import Footer from '../components/Footer/footer'
 import { useState } from 'react';
-import SearchOffers from '../components/Search/SearchOffers';
 import { Navigate } from 'react-router-dom';
 
 const SearchPage = () => {
@@ -39,13 +38,39 @@ const SearchPage = () => {
             return;
         }
 
-        // If all checks pass, proceed with the search action
-        setRedirect(true);
+        // If all checks pass, construct the URL with search parameters
+        const sessionToken = localStorage.getItem('TransactionStatus');
+        const onwardDate = tripData.selectedDepartDate.toISOString().split('T')[0];
+        const returnDate = tripData.selectedReturnDate ? tripData.selectedReturnDate.toISOString().split('T')[0] : '';
+
+        const urlParams = new URLSearchParams({
+            actioncode: 'FSAPIV4',
+            agentid: 'SUPER',
+            opid: 'FS000',
+            sessiontoken: sessionToken,
+            origin: tripData.departCity.value,
+            destination: tripData.destinationCity.value,
+            onwarddate: onwardDate,
+            returndate: returnDate,
+            numadults: tripData.adults,
+            numchildren: tripData.children,
+            numinfants: tripData.infants,
+            journeytype: 'OneWay',
+            prefclass: 'Y',
+            requestformat: 'JSON',
+            resultformat: 'JSON',
+            searchtype: 'normal',
+            numresults: 100
+        });
+
+        const customUrl = `/landing?${urlParams.toString()}`;
+
+        // Redirect to the constructed URL
+        setRedirect(customUrl);
     };
 
     if (redirect) {
-        // Pass trip data as state to the landing page
-        return <Navigate to="/landing" state={{ tripData: tripData }} />;
+        return <Navigate to={redirect} />;
     }
 
     return (
@@ -62,14 +87,11 @@ const SearchPage = () => {
                     <div className="flex flex-col sm:flex-row justify-center sm:mt-[110px] sm:z-2">
                         <SearchModal selectedIcon={selectedIcon} onTripDataSelect={handleTripDataSelect} />
                     </div>
-                    <div className="w-1/3 text-xl font-bold  sm:z-3 p-2 sm:mt-[-20px] bg-[#E0621A] text-white rounded-full transition duration-300 ease-in-out transform hover:scale-105">
-                        <button className="relative" onClick={() => handleSearch()}>
+                    <div className="w-1/3 text-xl font-bold sm:z-3 p-2 sm:mt-[-20px] bg-[#E0621A] text-white rounded-full transition duration-300 ease-in-out transform hover:scale-105">
+                        <button className="relative" onClick={handleSearch}>
                             Search
                         </button>
                     </div>
-                    {/* <div className="mt-[100px] w-full flex justify-center z-0">
-                        <SearchOffers />
-                    </div> */}
                 </div>
                 <div className="pt-48">
                     <Footer />

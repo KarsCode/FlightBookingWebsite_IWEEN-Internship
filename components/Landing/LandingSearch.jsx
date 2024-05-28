@@ -1,20 +1,45 @@
 /* eslint-disable react/prop-types */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useLocation } from 'react-router-dom';
 import Select from 'react-select';
 
 // eslint-disable-next-line react/prop-types
-const LandingSearch = ({tripData}) => {
+const LandingSearch = () => {
+    const location = useLocation();
     const today = new Date();
-    const [selectedDepartDate, setSelectedDepartDate] = useState(tripData?.selectedDepartDate || today);
-    const [selectedReturnDate, setSelectedReturnDate] = useState(tripData?.selectedReturnDate||null);
-    const [departCity, setDepartCity] = useState(tripData?.departCity || null);
-    const [destinationCity, setDestinationCity] = useState(tripData?.destinationCity || null);
-    const [adults, setAdults] = useState(tripData?.adults||1);
-    const [children, setChildren] = useState(tripData?.children||0);
-    const [infants, setInfants] = useState(tripData?.infants||0);
-    const [travelClass, setTravelClass] = useState(tripData?.travelClass||'Economy');
+    const [selectedDepartDate, setSelectedDepartDate] = useState(new Date());
+    const [selectedReturnDate, setSelectedReturnDate] = useState(null);
+    const [departCity, setDepartCity] = useState(null);
+    const [destinationCity, setDestinationCity] = useState(null);
+    const [adults, setAdults] = useState(1);
+    const [children, setChildren] = useState(0);
+    const [infants, setInfants] = useState(0);
+    const [travelClass, setTravelClass] = useState('Economy');
+
+    useEffect(() => {
+        const searchParams = new URLSearchParams(location.search);
+        const tripData = {
+            origin: searchParams.get('origin'),
+            destination: searchParams.get('destination'),
+            onwarddate: searchParams.get('onwarddate'),
+            returndate: searchParams.get('returndate'),
+            numadults: searchParams.get('numadults'),
+            numchildren: searchParams.get('numchildren'),
+            numinfants: searchParams.get('numinfants'),
+            prefclass: searchParams.get('prefclass') === 'Y' ? 'Economy' : searchParams.get('prefclass')
+        };
+
+        setSelectedDepartDate(new Date(tripData.onwarddate));
+        setSelectedReturnDate(tripData.returndate ? new Date(tripData.returndate) : null);
+        setDepartCity({ value: tripData.origin, label: tripData.origin });
+        setDestinationCity({ value: tripData.destination, label: tripData.destination });
+        setAdults(parseInt(tripData.numadults));
+        setChildren(parseInt(tripData.numchildren));
+        setInfants(parseInt(tripData.numinfants));
+        setTravelClass(tripData.prefclass);
+    }, [location]);
 
     const handleDepartDateChange = (date) => {
         setSelectedDepartDate(date);
@@ -23,6 +48,7 @@ const LandingSearch = ({tripData}) => {
     const handleReturnDateChange = (date) => {
         setSelectedReturnDate(date);
     };
+
 
     // Sample city options
     const cityOptions = [

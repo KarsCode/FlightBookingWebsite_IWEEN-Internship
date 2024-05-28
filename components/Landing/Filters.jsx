@@ -43,7 +43,7 @@ const Filters = () => {
   
 
   return (
-    <div className='flex flex-col bg-white rounded-lg h-full p-4 shadow-md'>
+    <div className='flex flex-col bg-white rounded-lg p-4 shadow-md'>
       <div className='p-4 border-b border-gray-300'>
         <div className='text-md font-semibold mb-2 text-left'>Search By Airlines</div>
         <div className='flex flex-col gap-2 text-sm'>

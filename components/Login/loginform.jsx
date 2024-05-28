@@ -1,21 +1,31 @@
 import { useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { Navigate } from 'react-router-dom';
-import LOGIN_API_URL from '../../config';
 
 const LoginForm = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [redirect, setRedirect] = useState(false);
   const [error, setError] = useState('');
-  
+  const [formData, setFormData] = useState({ UserId: '', password: '' });
+
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default form submission behavior
-    console.log(LOGIN_API_URL);
-    
+
+    // Construct the dynamic API URL using user input
+    const LOGIN_API_URL = `https://b2b.jasyatra.com/v2dispatch.jsp?agencycode=&agent_password=${encodeURIComponent(formData.password)}&agent_userid=${encodeURIComponent(formData.UserId)}&opid=AU001&otp=&responseformat=JSON&securetoken=faslkjfosadvsdklfj0u0&usertype=reactclient`;
+
     try {
       // Make API request
       const response = await fetch(LOGIN_API_URL, {
@@ -23,9 +33,7 @@ const LoginForm = () => {
       });
 
       if (!response.ok) {
-        
         throw new Error('Invalid response from server');
-        
       }
 
       const data = await response.json();
@@ -61,6 +69,8 @@ const LoginForm = () => {
             id="UserId"
             name="UserId"
             placeholder="User ID"
+            value={formData.UserId}
+            onChange={handleChange}
             className="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm sm:h-8 sm:flex sm:items-center sm:p-2"
           />
         </div>
@@ -74,6 +84,8 @@ const LoginForm = () => {
               id="password"
               name="password"
               placeholder="Password"
+              value={formData.password}
+              onChange={handleChange}
               className="mt-1 block w-full border-gray-300 rounded-md shadow-sm sm:text-sm sm:h-8 sm:flex sm:items-center sm:p-2"
             />
             <button
@@ -95,7 +107,7 @@ const LoginForm = () => {
         </div>
       </form>
       <div className="text-[#06539A] font-semibold">
-        {error && <p className="text-red-500 bg-gray-200">{error}</p>}
+        {error && <p className="text-red-500 bg-gray-200 p-2 rounded-md">{error}</p>}
         <a href="#">Forgot Password?</a>
       </div>
       <div className="text-[#E0621A] font-semibold">

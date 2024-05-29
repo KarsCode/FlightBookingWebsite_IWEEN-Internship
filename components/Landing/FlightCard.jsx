@@ -1,9 +1,17 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useState } from 'react';
 
+// Define a mapping for airline logos
+const airlineLogos = {
+    'Indigo': '/IndiGo-Logo.png',
+    'Vistara': '/Vistara-Logo.png',
+    'Spicejet': '/SpiceJet-Logo.png',
+    // Add other airlines and their logos here
+};
+
 const FlightCard = ({ flight }) => {
     const [activeTab, setActiveTab] = useState('FlightDetails');
-    console.log(flight.flightlegs)
 
     const handleTabChange = (tabName) => setActiveTab(tabName);
 
@@ -12,7 +20,7 @@ const FlightCard = ({ flight }) => {
         const hours = Math.floor(time / 100);
         const minutes = time % 100;
         const ampm = hours >= 12 ? 'PM' : 'AM';
-        const formattedHours = hours.toString().padStart(2, '0');
+        const formattedHours = hours % 12 || 12;
         const formattedMinutes = minutes.toString().padStart(2, '0');
         return `${formattedHours}:${formattedMinutes} ${ampm}`;
     };
@@ -24,31 +32,52 @@ const FlightCard = ({ flight }) => {
         } else {
             const hours = Math.floor(duration / 60);
             const minutes = duration % 60;
-
-            if (minutes === 0) {
-                return `${hours} hour${hours !== 1 ? 's' : ''}`;
-            } else {
-                return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
-            }
+            return `${hours} hour${hours !== 1 ? 's' : ''} ${minutes} minute${minutes !== 1 ? 's' : ''}`;
         }
     };
 
+    // Helper function to format total base fare as currency without decimals
+    const formatCurrency = (amount) => {
+        return new Intl.NumberFormat('en-IN', {
+            style: 'currency',
+            currency: 'INR',
+            maximumFractionDigits: 0 // This removes decimals
+        }).format(amount);
+    };
 
+    // Helper function to format terminal display
+    const formatTerminal = (terminal) => {
+        if (terminal === 'Terminal 1') return '1';
+        if (terminal === 'Terminal 2') return '2';
+        return terminal;
+    };
+
+    // Calculate total journey duration by summing up durations of all legs
+    const totalJourneyDuration = flight.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
+
+    // Get the last leg's destination and arrival time
+    const lastLegIndex = flight.flightlegs.length - 1;
+    const lastLeg = flight.flightlegs[lastLegIndex];
 
     return (
         <div className="flex flex-col bg-white rounded-3xl gap-1">
             <div className="flex gap-10 items-center justify-around pt-2">
                 {/* Logo and name */}
                 <div className="flex items-center gap-2 p-1">
-                    <div className=''>
-                        <img src='/planeimg.png' width="70" alt="Airline logo" />
+                    <div className='w-16 h-16 flex items-center'>
+                        <img 
+                            src={airlineLogos[flight.flightlegs[0].validatingcarriername] || '/default-logo.png'} 
+                            width="70" 
+                            alt="Airline logo" 
+                            className='rounded-md'
+                        />
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col pl-2">
                         <div className="font-semibold">
                             {flight.flightlegs[0].validatingcarriername}
                         </div>
                         <div className="text-gray-400 text-xs text-left">
-                            {flight.flightlegs[0].flightnumber}
+                            {flight.flightlegs[0].validatingcarrier}{flight.flightlegs[0].flightnumber}
                         </div>
                     </div>
                 </div>
@@ -66,27 +95,27 @@ const FlightCard = ({ flight }) => {
                 {/* Stopover, duration bar */}
                 <div className="flex flex-col p-3 items-center">
                     <div className="text-[#06539A]">
-                        {formatDuration(flight.flightlegs[0].journeyduration)}
+                        {formatDuration(totalJourneyDuration)}
                     </div>
                     <div className="text-sm text-gray-400">
-                        {flight.flightlegs[0].stopover == "" ? flight.flightlegs[0].stopover : 'No Stopover'}
+                        {flight.flightlegs.length === 1 ? 'No Stopover' : `${flight.flightlegs.length - 1} Stopover${flight.flightlegs.length > 2 ? 's' : ''}`}
                     </div>
                 </div>
 
                 {/* Arrival date */}
                 <div className="flex flex-col">
                     <div className="font-semibold text-xl">
-                        {formatTime(flight.flightlegs[0].arrtime)}
+                        {formatTime(lastLeg.arrtime)}
                     </div>
                     <div className="text-gray-400 text-sm text-right">
-                        {flight.flightlegs[0].destination_name}
+                        {lastLeg.destination_name}
                     </div>
                 </div>
 
                 {/* Fare */}
                 <div className="flex flex-col pl-10">
                     <div className="font-semibold text-xl text-[#06539A]">
-                        {flight.flightfare.totalbasefare}
+                        {formatCurrency(flight.flightfare.totalbasefare)}
                     </div>
                     <div className="text-gray-400 text-xs text-left">
                         {/* Original Fare Placeholder */}

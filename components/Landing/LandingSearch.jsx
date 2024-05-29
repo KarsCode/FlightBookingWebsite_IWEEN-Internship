@@ -1,8 +1,9 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from 'react';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
 
 // eslint-disable-next-line react/prop-types
@@ -17,6 +18,11 @@ const LandingSearch = () => {
     const [children, setChildren] = useState(0);
     const [infants, setInfants] = useState(0);
     const [travelClass, setTravelClass] = useState('Economy');
+    const [cityOptions, setCityOptions] = useState([]);
+    const [searchInput, setSearchInput] = useState('');
+    const [departCityInput, setDepartCityInput] = useState('');
+    const [destinationCityInput, setDestinationCityInput] = useState('');
+    const [redirect, setRedirect] = useState(false);
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
@@ -49,15 +55,34 @@ const LandingSearch = () => {
         setSelectedReturnDate(date);
     };
 
+    
+    const fetchCityOptions = async () => {
+        try {
+            const sessionToken = localStorage.getItem('TransactionStatus');
+            const response = await fetch(`https://b2b.jasyatra.com/v2dispatch.jsp?actioncode=SEARCHAIR&opid=FS000&searchkey=${searchInput}&sessiontoken=${sessionToken}`);
+            const data = await response.json();
+            const airports = data?.Root?.Result?.AirportDetail || [];
+            const options = airports.map(airport => ({
+                value: airport.AirportCode,
+                label: airport.AirportName,
+            }));
+            setCityOptions(options);
+        } catch (error) {
+            console.error('Error fetching city options:', error);
+        }
+    };
 
-    // Sample city options
-    const cityOptions = [
-        { value: 'DEL', label: 'New Delhi' },
-        { value: 'BOM', label: 'Mumbai' },
-        { value: 'BLR', label: 'Bangalore' },
-        { value: 'CCU', label: 'Kolkata' },
-        // Add more city options as needed
-    ];
+    useEffect(() => {
+        if (searchInput.trim() !== '') {
+            fetchCityOptions();
+        } else {
+            setCityOptions([]);
+        }
+    
+    }, [searchInput]);
+
+
+
     const renderAdultButtons = () => {
         const adultButtons = [];
         for (let i = 1; i <= 9; i++) {
@@ -106,13 +131,61 @@ const LandingSearch = () => {
         return infantsButtons;
     };
 
+    const handleSearch = () =>{
+        if(!departCity.value || !destinationCity.value){
+            window.alert("Please fill in all required fields: Depart City, Arrival City, and Depart Date");
+            return;
+        }
+
+        if(departCity.value === destinationCity.value){
+            window.alert("Depart City and Destination City Cannot be the Same");
+            return;
+        }
+        const sessionToken = localStorage.getItem('TransactionStatus');
+        const onwardDate = selectedDepartDate.toISOString().split('T')[0];
+        const returnDate = selectedReturnDate? selectedReturnDate.toISOString().split('T')[0]: '';
+
+        const urlParams = new URLSearchParams({
+            actioncode: 'FSAPIV4',
+            agentid: 'SUPER',
+            opid: 'FS000',
+            sessiontoken: sessionToken,
+            origin: departCity.value,
+            destination: destinationCity.value,
+            onwarddate: onwardDate,
+            returndate: returnDate,
+            numadults: adults,
+            numchildren: children,
+            numinfants: infants,
+            journeytype: 'OneWay',
+            prefclass: 'Y',
+            requestformat: 'JSON',
+            resultformat: 'JSON',
+            searchtype: 'normal',
+            numresults: 100
+        });
+
+        const customUrl = `/landing?${urlParams.toString()}`;
+        window.location.href = customUrl
+        //setRedirect(customUrl);
+    };
+    if (redirect) {
+        return <Navigate to={redirect} />;
+    }
+
     return (
         <div className='flex gap-3 text-white items-center pl-24 pt-10'>
             <div className='flex flex-col text-left w-48 bg-white bg-opacity-10 p-2 rounded-md'>
                 <div className="text-xs">From</div>
                 <Select
                     value={departCity}
-                    onChange={setDepartCity}
+                    onChange={(selectedOption) => {
+                        setDepartCity(selectedOption);
+                    }}
+                    onInputChange={(inputValue) => {
+                        setDepartCityInput(inputValue);
+                        setSearchInput(inputValue); // Update searchInput state
+                    }}
                     options={cityOptions}
                     placeholder="Departure"
                     className='text-sm'
@@ -156,7 +229,13 @@ const LandingSearch = () => {
                 <div className="text-xs">To</div>
                 <Select
                     value={destinationCity}
-                    onChange={setDestinationCity}
+                    onChange={(selectedOption) => {
+                        setDestinationCity(selectedOption);
+                    }}
+                    onInputChange={(inputValue) => {
+                        setDestinationCityInput(inputValue);
+                        setSearchInput(inputValue); // Update searchInput state
+                    }}
                     options={cityOptions}
                     placeholder="Destination"
                     className='text-sm'
@@ -220,10 +299,6 @@ const LandingSearch = () => {
                 />
             </div>
 
-            {/* <div className='flex flex-col w-48 bg-white bg-opacity-10 p-2 rounded-md'>
-                <div className="text-xs text-left">Passenger/Class</div>
-                <div className="text-lg font-medium">Economy</div>
-            </div> */}
                         <div className='flex flex-col w-48 h-[70px] bg-white bg-opacity-10 p-2 rounded-md'>
                 <div className="text-xs text-left">Passenger/Class</div>
                 <div className="dropdown pt-1 text-left">
@@ -264,7 +339,7 @@ const LandingSearch = () => {
             </div>
 
 
-            <button className="flex justify-center w-64 bg-[#E0621A] p-[15px] rounded-md">Search</button>
+            <button className="flex justify-center w-64 bg-[#E0621A] p-[15px] rounded-md" onClick={handleSearch}>Search</button>
 
         </div>
     );

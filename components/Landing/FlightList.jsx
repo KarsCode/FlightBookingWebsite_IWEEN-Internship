@@ -1,13 +1,17 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+
 import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import FlightCard from './FlightCard';
 import { getUrlParams } from '../../utils/params';
+import './FlightList.css'
 
 const FlightList = () => {
     const location = useLocation();
     const [selectedButton, setSelectedButton] = useState('Cheapest Flights');
     const [flights, setFlights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+
 
     const handleButtonClick = (buttonName) => {
         setSelectedButton(buttonName === selectedButton ? '' : buttonName);
@@ -16,11 +20,10 @@ const FlightList = () => {
     useEffect(() => {
         const fetchFlights = async () => {
             const params = getUrlParams(location);
-            const carriers = ['6E', 'SG', 'AI', 'IX', 'UK'];
+            const carriers = ['SG', '6E', 'UK'];
             const allFlights = [];
 
             for (const carrier of carriers) {
-
                 const xmlRequest = `
                 <flightsearchrequest>
                     <credentials>
@@ -55,10 +58,7 @@ const FlightList = () => {
                 </flightsearchrequest>
             `.trim();
 
-
-
-
-                const sessionToken = localStorage.getItem('TransactionStatus')
+                const sessionToken = localStorage.getItem('TransactionStatus');
                 const url = `https://b2b.jasyatra.com/v2dispatch.jsp?actioncode=FSAPIV4&agentid=SUPER&opid=FS000&sessiontoken=${sessionToken}&xmlorjson=${encodeURIComponent(xmlRequest)}`;
 
                 try {
@@ -73,31 +73,43 @@ const FlightList = () => {
                     setIsLoading(false);
                 }
             }
-
-            if (selectedButton === 'Cheapest Flights') {
-                allFlights.sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare);
-            }
-            if (selectedButton === 'Shortest Duration') {
-                allFlights.sort((a, b) => a.flightlegs[0].journeyduration - b.flightlegs[0].journeyduration);
-            }
-            console.log("All flights:", allFlights);
+            allFlights.sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare);
             setFlights(allFlights);
+            console.log(flights)
             setIsLoading(false);
-
-
         };
 
         fetchFlights();
-    }, [location,selectedButton]);
+    }, [location]);
+
+    useEffect(() => {
+        if (selectedButton === 'Cheapest Flights') {
+            setFlights([...flights].sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare));
+        } else if (selectedButton === 'Shortest Duration') {
+            console.log(flights[0].flightlegs.length)
+            setFlights([...flights].sort((a, b) => {
+                const totalDurationA = a.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
+                const totalDurationB = b.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
+                return totalDurationA - totalDurationB;
+            }));
+
+        }
+        // console.log(flights[0].flightlegs.length)
+    }, [selectedButton]);
 
     if (isLoading) {
-        return <div>Loading...</div>;
+        return (
+            <div className='flex items-center justify-center'>
+                <div className='loader mt-80'>
+                </div>
+            </div>
+        );
     }
 
     return (
         <div className="flex flex-col gap-2 w-5/6">
             <div className="text-left text-4xl font-semibold text-white">
-                Flights from {flights.length > 0 && flights[0].origin} to {flights.length > 0 && flights[0].destination}
+                Flights from {flights[0].flightlegs[0].origin_name} to {flights[0].flightlegs[flights[0].flightlegs.length-1].destination_name}
             </div>
 
             <div className="flex items-center h-[60px] bg-gray-300 rounded-xl">
@@ -124,7 +136,6 @@ const FlightList = () => {
             <div className='flex flex-col gap-3 pt-3'>
                 {flights.map((flight) => (
                     <FlightCard key={flight.nextraflightkey} flight={flight} />
-
                 ))}
             </div>
         </div>

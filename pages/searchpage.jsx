@@ -84,7 +84,7 @@ const SearchPage = () => {
                     <div className="sm:absolute flex w-full justify-center pt-10 sm:px-4 sm:pt-12 z-3">
                         <Navbar handleIconClick={handleIconClick} />
                     </div>
-                    <div className="flex flex-col sm:flex-row justify-center sm:mt-[110px] sm:z-2">
+                    <div className="w-full flex flex-col sm:flex-row justify-center sm:mt-[110px] sm:z-2">
                         <SearchModal selectedIcon={selectedIcon} onTripDataSelect={handleTripDataSelect} />
                     </div>
                     <div className="w-1/3 text-xl font-bold sm:z-3 p-2 sm:mt-[-20px] bg-[#E0621A] text-white rounded-full transition duration-300 ease-in-out transform hover:scale-105">

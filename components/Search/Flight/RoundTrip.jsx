@@ -161,9 +161,9 @@
 
         return (
 
-            <div className={`flex flex-col sm:flex-row gap-2 text-lg pt-4 items-center sm:items-start ${isDepartDatePickerOpen ? 'pb-40' : ''} ${isDropdownOpen ? 'pb-12' : ''}`}>
-                <div className='flex flex-col items-center sm:flex-row gap-[2px]'>
-                    <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px]  pb-2 pl-2 border-1 border-black rounded-md'>
+            <div className={`flex flex-col sm:flex-row sm:gap-2 gap-3 text-lg pt-4 items-center sm:items-start ${isDepartDatePickerOpen ? 'pb-40' : ''} ${isDropdownOpen ? 'pb-12' : ''} `}>
+                <div className='flex flex-col sm:flex-row sm:gap-[2px] gap-3'>
+                    <div className='flex flex-col items-start font-light sm:w-[240px] sm:h-[104px]  pb-2 pl-2 border-1 border-gray-300 rounded-md'>
                         <div>Depart From</div>
                         <Select
                             value={departCity}
@@ -178,10 +178,15 @@
                             options={departCityInput ? cityOptions : []}
                             placeholder="Select Depart City"
                             noOptionsMessage={() => departCityInput ? 'No options' : 'Type to search'}
-                            className='w-[220px] font-semibold text-sm text-left'
+                            className='w-[220px] font-semibold text-md text-left'
                             onMenuOpen={() => { setIsDropdownOpen(true) }}
                             onMenuClose={() => { setIsDropdownOpen(false); handleTripDataSelect(); }}
                             styles={{
+                                control: (provided) => ({
+                                    ...provided,
+                                    border: 'none',
+                                    boxShadow: 'none',
+                                }),
                                 menu: provided => ({
                                     ...provided,
                                     overflow: 'hidden', // Hide the default scrollbar
@@ -196,7 +201,7 @@
                         />
                         <div>{departCity ? departCity.value : ''}</div>
                     </div> 
-                    <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 pb-2 border-1 border-black rounded-md'>
+                    <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 pb-2 border-1 border-gray-300 rounded-md'>
                         <div>Going To</div>
                         <Select
                             value={destinationCity}
@@ -211,10 +216,15 @@
                             options={destinationCityInput ? cityOptions : []}
                             placeholder="Select Destination"
                             noOptionsMessage={() => destinationCityInput ? 'No options' : 'Type to search'}
-                            className='w-[220px] font-semibold text-sm text-left'
+                            className='w-[220px] font-semibold text-normal text-left'
                             onMenuOpen={() => { setIsDropdownOpen(true) }}
                             onMenuClose={() => { setIsDropdownOpen(false); handleTripDataSelect(); }}
                             styles={{
+                                control: (provided) => ({
+                                    ...provided,
+                                    border: 'none',
+                                    boxShadow: 'none',
+                                }),
                                 menu: provided => ({
                                     ...provided,
                                     overflow: 'hidden', // Hide the default scrollbar
@@ -232,15 +242,15 @@
                     </div>
                 </div>
 
-                <div className='flex flex-col sm:flex-row items-center gap-[2px]'>
-                    <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 border-1 border-black rounded-md'>
+                <div className='flex flex-col sm:flex-row items-center sm:gap-[2px] gap-3'>
+                    <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 border-1 border-gray-300  rounded-md'>
                         <div>Depart Date</div>
                         <div className='font-semibold'>
                             <DatePicker
                                 selected={selectedDepartDate}
                                 onChange={handleDepartDateChange}
                                 dateFormat='dd/MM/yyyy'
-                                className='font-semibold text-sm'
+                                className='font-semibold text-md'
                                 popperClassName='date-picker-popper'
                                 minDate={today}
                                 onCalendarOpen={() => handleDepartDatePickerToggle(true)}
@@ -254,14 +264,14 @@
                         </div>
                     </div>
 
-                    <div className={`flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 border-1 ${tripMode === 'OneWay' ? 'bg-gray-300 ' : ''}border-black rounded-md`} style={{ pointerEvents: tripMode === 'OneWay' ? 'none' : 'auto' }}>
+                    <div className={`flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 border-1 ${tripMode === 'OneWay' ? 'bg-gray-300 ' : ''}border-gray-300  rounded-md`} style={{ pointerEvents: tripMode === 'OneWay' ? 'none' : 'auto' }}>
                         <div>Return Date</div>
                         <div className='font-semibold'>
                             <DatePicker
                                 selected={selectedReturnDate}
                                 onChange={handleReturnDateChange}
                                 dateFormat='dd/MM/yyyy'
-                                className={`font-semibold text-sm ${tripMode === 'OneWay' ? 'bg-gray-300' : ''}`}
+                                className={`font-semibold text-md ${tripMode === 'OneWay' ? 'bg-gray-300' : ''} border-b border-gray-400`}
                                 popperClassName='date-picker-popper'
                                 minDate={selectedDepartDate}
                                 disabled={tripMode === 'OneWay'}
@@ -272,25 +282,25 @@
                         <div>
                             {selectedReturnDate && (
                                 <div>{selectedReturnDate.toLocaleDateString('en-US', { weekday: 'long' })}</div>
-                            )}
+                            )}  
                         </div>
                     </div>
 
                 </div>
-                <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 border-1 border-black rounded-md'>
+                <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 border-1 border-gray-300  rounded-md'>
                     <div>Travellers, Class</div>
                     <div className="dropdown ">
                         <button className="btn btn-secondary dropdown-toggle text-black bg-white top-auto bottom-[100%]" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onClick={() => { setIsDropdownOpen(!isDropdownOpen); handleTripDataSelect(); }}>
                             {adults + children + infants} Travellers, {travelClass}
                         </button>
-                        <div className="dropdown-menu bg-red-100" aria-labelledby="dropdownMenuButton">
+                        <div className="dropdown-menu overflow-auto bg-red-100" aria-labelledby="dropdownMenuButton">
                             <div className="dropdown-item hover:bg-transparent text-black">
                                 <div className="d-flex text-sm flex-col align-items-start">
                                     <span className="font-bold mr-2">Adults(12y+):</span>
                                     <div className="btn-group mr-2 p-2">
                                         {renderAdultButtons()}
                                     </div>
-                                </div>
+                                </div>  
                             </div>
                             <div className="dropdown-item hover:bg-transparent text-black">
                                 <div className="d-flex text-sm flex-col align-items-start">

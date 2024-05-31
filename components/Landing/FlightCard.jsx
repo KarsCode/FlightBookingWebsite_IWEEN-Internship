@@ -1,6 +1,8 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useState } from 'react';
+import FlightDetails from './ModalFiles/FlightDetails';
+import { Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { IoClose } from "react-icons/io5";
 
 // Define a mapping for airline logos
 const airlineLogos = {
@@ -11,11 +13,17 @@ const airlineLogos = {
 };
 
 const FlightCard = ({ flight }) => {
-    const [activeTab, setActiveTab] = useState('FlightDetails');
+    const [activeTab, setActiveTab] = useState('');
+    const [open, setOpen] = useState(false);
 
-    const handleTabChange = (tabName) => setActiveTab(tabName);
+    const handleTabChange = (tabName) => {
+        setActiveTab(tabName);
+    };
 
-    // Helper function to format time from 4-digit number to "HH:MM AM/PM" format
+    const handleClose = () => {
+        setOpen(false);
+    };
+
     const formatTime = (time) => {
         const hours = Math.floor(time / 100);
         const minutes = time % 100;
@@ -23,9 +31,8 @@ const FlightCard = ({ flight }) => {
         const formattedHours = hours % 12 || 12;
         const formattedMinutes = minutes.toString().padStart(2, '0');
         return `${formattedHours}:${formattedMinutes} ${ampm}`;
-    };
-
-    // Helper function to convert duration from minutes to "hours minutes" format
+    }; 
+    
     const formatDuration = (duration) => {
         if (duration < 60) {
             return `${duration} minute${duration !== 1 ? 's' : ''}`;
@@ -36,29 +43,18 @@ const FlightCard = ({ flight }) => {
         }
     };
 
-    // Helper function to format total base fare as currency without decimals
     const formatCurrency = (amount) => {
         return new Intl.NumberFormat('en-IN', {
             style: 'currency',
             currency: 'INR',
-            maximumFractionDigits: 0 // This removes decimals
+            maximumFractionDigits: 0
         }).format(amount);
     };
 
-    // Helper function to format terminal display
-    const formatTerminal = (terminal) => {
-        if (terminal === 'Terminal 1') return '1';
-        if (terminal === 'Terminal 2') return '2';
-        return terminal;
-    };
-
-    // Calculate total journey duration by summing up durations of all legs
     const totalJourneyDuration = flight.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
 
-    // Get the last leg's destination and arrival time
     const lastLegIndex = flight.flightlegs.length - 1;
     const lastLeg = flight.flightlegs[lastLegIndex];
-
 
     return (
         <div className="flex flex-col bg-white rounded-3xl w-3/4 sm:w-full gap-1">
@@ -66,10 +62,10 @@ const FlightCard = ({ flight }) => {
                 {/* Logo and name */}
                 <div className="flex items-center gap-2 p-1">
                     <div className='w-16 h-16 flex items-center'>
-                        <img 
-                            src={airlineLogos[flight.flightlegs[0].validatingcarriername] || '/default-logo.png'} 
-                            width="70" 
-                            alt="Airline logo" 
+                        <img
+                            src={airlineLogos[flight.flightlegs[0].validatingcarriername]}
+                            width="70"
+                            alt="Airline logo"
                             className='rounded-md'
                         />
                     </div>
@@ -131,66 +127,77 @@ const FlightCard = ({ flight }) => {
                         </button>
                     </div>
 
-                    <div className="">
-                        <button
-                            className="text-orange-400 underline text-sm pt-1"
-                            data-toggle="modal"
-                            data-target="#ModalCenter"
-                            onClick={() => handleTabChange('FlightDetails')}
-                        >
-                            Flight Details
-                        </button>
+                    <button
+                        className="text-orange-400 underline text-sm pt-1"
+                        onClick={() => { handleTabChange('FlightDetails'); setOpen(true); }}
+                    >
+                        Flight Details
+                    </button>
 
-                        <div className="modal" id="ModalCenter" tabIndex="-1" role="dialog" aria-labelledby="ModalCenterTitle" aria-hidden="true">
-                            <div className="modal-dialog modal-dialog-centered modal-lg" role="document">
-                                <div className="modal-content w-max">
-                                    <div className="modal-header justify-between">
-                                        <h5 className="modal-title font-bold" id="ModalLongTitle">Modal title</h5>
-                                        <button type="button" className="close" data-dismiss="modal" aria-label="Close">
-                                            <span className="text-black">Close</span>
-                                        </button>
-                                    </div>
-                                    <div>
-                                        <div className="flex flex-col">
-                                            <div className="flex bg-gray-200 w-full p-2 text-sm gap-3">
-                                                <div>
-                                                    <button
-                                                        className={`rounded-2xl px-2 py-1 focus:outline-none  ${activeTab === 'FlightDetails' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
-                                                        onClick={() => handleTabChange('FlightDetails')}
-                                                    >
-                                                        Flight Details
-                                                    </button>
-                                                </div>
-                                                <div>
-                                                    <button
-                                                        className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'FareSummary' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
-                                                        onClick={() => handleTabChange('FareSummary')}
-                                                    >
-                                                        Fare Summary
-                                                    </button>
-                                                </div>
-                                                <div>
-                                                    <button
-                                                        className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'Cancellation' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
-                                                        onClick={() => handleTabChange('Cancellation')}
-                                                    >
-                                                        Cancellation
-                                                    </button>
-                                                </div>
-                                                <div>
-                                                    <button
-                                                        className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'ChangeDate' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
-                                                        onClick={() => handleTabChange('ChangeDate')}
-                                                    >
-                                                        Change Date
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+                    <div className='l'>
+                    <Dialog open={open} onClose={handleClose} className=' lexend-deca font-normal'>
+                        <DialogTitle className='bg-white pb-2'>
+                            <div className='flex gap-20 items-center justify-between'>
+                                <div className='lexend-deca font-normal'>
+                                    Flight Details
+                                </div>
+                                <div className='text-gray-500' onClick={handleClose}>
+                                    <IoClose size={30}/>  
                                 </div>
                             </div>
-                        </div>
+                        </DialogTitle>
+                        <DialogContent className='p-0'>
+                            <div className="flex bg-gray-200 w-full p-2 text-sm gap-3 h-[55px]">
+                                <button
+                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'FlightDetails' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
+                                    onClick={() => handleTabChange('FlightDetails')}
+                                >
+                                    Flight Details
+                                </button>
+                                <button
+                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'FareSummary' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
+                                    onClick={() => handleTabChange('FareSummary')}
+                                >
+                                    Fare Summary
+                                </button>
+                                <button
+                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'Cancellation' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
+                                    onClick={() => handleTabChange('Cancellation')}
+                                >
+                                    Cancellation
+                                </button>
+                                <button
+                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'ChangeDate' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
+                                    onClick={() => handleTabChange('ChangeDate')}
+                                >
+                                    Change Date
+                                </button>
+                            </div>
+
+                            {/* Render content based on activeTab */}
+                            {activeTab === 'FlightDetails' && (
+                                <FlightDetails flight={flight} />
+                            )}
+                            {activeTab === 'FareSummary' && (
+                                <div>
+                                    {/* Your Fare Summary content here */}
+                                    Fare Summary
+                                </div>
+                            )}
+                            {activeTab === 'Cancellation' && (
+                                <div>
+                                    {/* Your Cancellation content here */}
+                                    Cancellation
+                                </div>
+                            )}
+                            {activeTab === 'ChangeDate' && (
+                                <div>
+                                    {/* Your Change Date content here */}
+                                    Change Date
+                                </div>
+                            )}
+                        </DialogContent>
+                    </Dialog>
                     </div>
                 </div>
             </div>
@@ -203,3 +210,4 @@ const FlightCard = ({ flight }) => {
 };
 
 export default FlightCard;
+

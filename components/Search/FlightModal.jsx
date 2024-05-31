@@ -10,7 +10,7 @@ const FlightModal = ({onTripDataSelect}) => {
     };
   
     return (
-      <div className="sm:pt-10 pl-5 ">
+      <div className="sm:pt-10 sm:pl-5">
         <div className=" flex flex-col items-center sm:flex-row sm:w-full sm:justify-items-start font-medium">
           <div className="form-check form-check-inline">
             <input className="form-check-input" type="radio" name="exampleRadios" id="oneway" value="oneway" checked={selectedOption === 'oneway'}
@@ -31,7 +31,7 @@ const FlightModal = ({onTripDataSelect}) => {
         {selectedOption === 'oneway' && <RoundTrip tripMode={'OneWay'} onTripDataSelect={onTripDataSelect}/>}
         {selectedOption === 'roundtrip' && <RoundTrip tripMode={'RoundTrip'} onTripDataSelect={onTripDataSelect}/>}
         
-        <div className="pb-[50px] pt-4 text-sm sm:text-normal sm:font-medium flex items-start">
+        <div className="pb-[50px] pt-4 text-sm sm:text-normal sm:font-medium flex">
           <div className="form-check form-check-inline">
             <input className="form-check-input" type="checkbox" id="inlineCheckbox1" value="option1" />
             <label className="form-check-label" htmlFor="inlineCheckbox1">Non Stop Flights</label>

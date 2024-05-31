@@ -19,7 +19,7 @@ const Info = () => {
         <div className="font-light">3872895273</div>
         <div className="font-light">3276786287</div>
       </div>
-      <div className="flex flex-wrap gap-2 items-center justify-evenly">
+      <div className="flex flex-col sm:flex-row gap-2 items-start justify-evenly">
         <CiMail/>
         <div className="font-light">jasyatraoffical@jasyatra.com</div>
         <div className="font-light">sales@jasyatra.com</div>

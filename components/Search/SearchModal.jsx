@@ -4,7 +4,7 @@ import FlightModal from "./FlightModal"
 // eslint-disable-next-line react/prop-types
 const SearchModal = ({ selectedIcon, onTripDataSelect }) => {
   return (
-    <div className="flex p-2 bg-white rounded-3xl">
+    <div className="flex p-2 bg-white rounded-2xl">
       {selectedIcon === 'flight' && <FlightModal onTripDataSelect={onTripDataSelect} />}
 
     </div>

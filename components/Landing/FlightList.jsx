@@ -7,8 +7,7 @@ import FlightCard from './FlightCard';
 import { getUrlParams } from '../../utils/params';
 import './FlightList.css'
 const FlightList = ({ filters }) => {
-    console.log(filters.selectedDepartTime)
-    const location = useLocation();
+    const location = useLocation(); 
     const [selectedButton, setSelectedButton] = useState('Cheapest Flights');
     const [flights, setFlights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +20,7 @@ const FlightList = ({ filters }) => {
     useEffect(() => {
         const fetchFlights = async () => {
             const params = getUrlParams(location);
-            const carriers = ['SG', '6E', 'UK'];
+            const carriers = ['6E'];
             const allFlights = [];
 
             for (const carrier of carriers) {
@@ -76,7 +75,6 @@ const FlightList = ({ filters }) => {
             }
             allFlights.sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare);
             setFlights(allFlights);
-            console.log(flights)
             setIsLoading(false);
         };
 
@@ -95,14 +93,16 @@ const FlightList = ({ filters }) => {
             }));
 
         }
-        // console.log(flights[0].flightlegs.length)
     }, [selectedButton]);
 
 
     if (isLoading) {
         return (
-            <div className='flex items-center justify-center'>
-                <div className='loader mt-80'>
+            <div className='flex flex-col items-center justify-center sm:h-1/3 h-[250px] gap-12'>
+                <div className='font-semibold text-xl sm:hidden'>
+                    Loding Flights
+                </div>
+                <div className='loader sm:mt-80'>
                 </div>
             </div>
         );
@@ -150,6 +150,7 @@ const FlightList = ({ filters }) => {
                     )
                     .map(flight => (
                         <FlightCard key={flight.nextraflightkey} flight={flight} />
+
                     ))}
 
 

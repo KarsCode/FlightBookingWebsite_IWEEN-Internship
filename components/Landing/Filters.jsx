@@ -1,33 +1,82 @@
-import { useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState } from 'react';
 import { FaRegMoon } from 'react-icons/fa';
 
-const Filters = () => {
+// eslint-disable-next-line react/prop-types
+const Filters = ({ onFilterChange }) => {
   const [selectedAirline, setSelectedAirline] = useState('');
   const [priceRange, setPriceRange] = useState([1010, 9999]);
-  const [selectedDepartTime, setSelectedDepartTime] = useState('');
-  const [selectedArrivalTime, setSelectedArrivalTime] = useState('');
+  const [selectedDepartTime, setSelectedDepartTime] = useState([]);
+  const [selectedArrivalTime, setSelectedArrivalTime] = useState([]);
   const [selectedFarePolicy, setSelectedFarePolicy] = useState([]);
   // eslint-disable-next-line no-unused-vars
   const [flightNumber, setFlightNumber] = useState('');
 
   const handleAirlineChange = (event) => {
-    setSelectedAirline(event.target.value);
+    const airline = event.target.value;
+    if (selectedAirline === airline) {
+      setSelectedAirline('');
+    } else {
+      setSelectedAirline(airline);
+    }
   };
 
   const handlePriceRangeChange = (event) => {
     const maxPrice = event.target.value;
     setPriceRange([priceRange[0], maxPrice]);
-};
-
+  };
   const handleDepartTimeChange = (time) => {
-    setSelectedDepartTime(time);
+    let timeRange = [];
+    // If the selected departure time is already the same as the clicked time, clear the selection
+    if (selectedDepartTime.length === 2 && selectedDepartTime[0] === timeRange[0] && selectedDepartTime[1] === timeRange[1]) {
+      setSelectedDepartTime([]);
+    } else {
+      switch (time) {
+        case '00-06':
+          timeRange = [0, 600];
+          break;
+        case '06-12':
+          timeRange = [600, 1200];
+          break;
+        case '12-18':
+          timeRange = [1200, 1800];
+          break;
+        case '18-24':
+          timeRange = [1800, 2400];
+          break;
+        default:
+          timeRange = [];
+      }
+      setSelectedDepartTime(timeRange);
+    }
   };
-
-
-
+    
   const handleArrivalTimeChange = (time) => {
-    setSelectedArrivalTime(time);
+    let timeRange = [];
+    // If the selected arrival time is already the same as the clicked time, clear the selection
+    if (selectedArrivalTime.length === 2 && selectedArrivalTime[0] === timeRange[0] && selectedArrivalTime[1] === timeRange[1]) {
+      setSelectedArrivalTime([]);
+    } else {
+      switch (time) {
+        case '00-06':
+          timeRange = [0, 600];
+          break;
+        case '06-12':
+          timeRange = [600, 1200];
+          break;
+        case '12-18':
+          timeRange = [1200, 1800];
+          break;
+        case '18-24':
+          timeRange = [1800, 2400];
+          break;
+        default:
+          timeRange = [];
+      }
+      setSelectedArrivalTime(timeRange);
+    }
   };
+  
 
   const handleFarePolicyChange = (policy) => {
     if (selectedFarePolicy.includes(policy)) {
@@ -42,41 +91,63 @@ const Filters = () => {
   };
 
 
+  useEffect(() => {
+    // Call the onFilterChange callback with the updated filter state
+    onFilterChange({
+      selectedAirline,
+      priceRange,
+      selectedDepartTime,
+      selectedArrivalTime,
+      // selectedFarePolicy,
+      flightNumber
+    });
+  }, [selectedAirline, priceRange, selectedDepartTime, selectedArrivalTime, selectedFarePolicy, flightNumber]);
+
+
   return (
     <div className='flex flex-col bg-white rounded-lg p-4 shadow-md'>
       <div className='p-4 border-b border-gray-300'>
-        <div className='text-md font-semibold mb-2 text-left'>Search By Airlines</div>
-        <div className='flex flex-col gap-2 text-sm'>
-          <label className='flex items-center gap-2'>
+        <div className='text-md font-semibold mb-2'>Search By Airlines</div>
+        <div className='flex flex-col gap-2 text-sm items-center'>
+          <div className='form-check'>
             <input
-              type='radio'
+              className='form-check-input'
+              type='checkbox'
               value='Indigo'
+              id='airlineIndigo'
               checked={selectedAirline === 'Indigo'}
               onChange={handleAirlineChange}
-              className='h-4 w-4 border border-gray-300 rounded-md checked:border-transparent focus:outline-none'
             />
-            <span>Indigo</span>
-          </label>
-          <label className='flex items-center gap-2'>
+            <label className='form-check-label' htmlFor='airlineIndigo'>
+              Indigo
+            </label>
+          </div>
+          <div className='form-check'>
             <input
-              type='radio'
+              className='form-check-input'
+              type='checkbox'
               value='Spicejet'
+              id='airlineSpicejet'
               checked={selectedAirline === 'Spicejet'}
               onChange={handleAirlineChange}
-              className=' h-4 w-4 border border-gray-300 rounded-md checked:border-transparent focus:outline-none'
             />
-            <span>Spicejet</span>
-          </label>
-          <label className='flex items-center gap-2'>
+            <label className='form-check-label' htmlFor='airlineSpicejet'>
+              Spicejet
+            </label>
+          </div>
+          <div className='form-check'>
             <input
-              type='radio'
+              className='form-check-input'
+              type='checkbox'
               value='Vistara'
+              id='airlineVistara'
               checked={selectedAirline === 'Vistara'}
               onChange={handleAirlineChange}
-              className='h-4 w-4 border border-gray-300 rounded-md checked:border-transparent focus:outline-none'
             />
-            <span>Vistara</span>
-          </label>
+            <label className='form-check-label' htmlFor='airlineVistara'>
+              Vistara
+            </label>
+          </div>
         </div>
       </div>
 
@@ -109,28 +180,28 @@ const Filters = () => {
         <div className='text-md font-semibold mb-2 text-left'>Departure Time</div>
         <div className='grid grid-cols-2 gap-4'>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime === '00-06' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime[0] === 0? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleDepartTimeChange(selectedDepartTime === '00-06' ? '' : '00-06')}
           >
             <img src='/sunrise.png' width='25' height='5' />
             <span>00 - 06</span>
           </button>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime === '06-12' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime[0] === 600 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleDepartTimeChange(selectedDepartTime === '06-12' ? '' : '06-12')}
           >
             <img src='/sunup.png' width='25' height='5' />
             <span>06 - 12</span>
           </button>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime === '12-18' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime[0] === 1200 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleDepartTimeChange(selectedDepartTime === '12-18' ? '' : '12-18')}
           >
             <img src='/sunset.png' width='25' height='5' />
             <span>12 - 18</span>
           </button>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime === '18-24' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime[0] === 1800 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleDepartTimeChange(selectedDepartTime === '18-24' ? '' : '18-24')}
           >
             <FaRegMoon size={20} />
@@ -148,28 +219,28 @@ const Filters = () => {
         <div className='text-md font-semibold mb-2 text-left'>Arrival Time</div>
         <div className='grid grid-cols-2 gap-4'>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime === '00-06' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0]===0 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleArrivalTimeChange(selectedArrivalTime === '00-06' ? '' : '00-06')}
           >
             <img src='/sunrise.png' width='25' height='5' />
             <span>00 - 06</span>
           </button>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime === '06-12' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0]===600 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleArrivalTimeChange(selectedArrivalTime === '06-12' ? '' : '06-12')}
           >
             <img src='/sunup.png' width='25' height='5' />
             <span>06 - 12</span>
           </button>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime === '12-18' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0]===1200 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleArrivalTimeChange(selectedArrivalTime === '12-18' ? '' : '12-18')}
           >
             <img src='/sunset.png' width='25' height='5' />
             <span>12 - 18</span>
           </button>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime === '18-24' ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0]===1800 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleArrivalTimeChange(selectedArrivalTime === '18-24' ? '' : '18-24')}
           >
             <FaRegMoon size={20} />

@@ -55,7 +55,7 @@ const LandingSearch = () => {
         setSelectedReturnDate(date);
     };
 
-    
+
     const fetchCityOptions = async () => {
         try {
             const sessionToken = localStorage.getItem('TransactionStatus');
@@ -78,7 +78,8 @@ const LandingSearch = () => {
         } else {
             setCityOptions([]);
         }
-    
+
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchInput]);
 
 
@@ -131,19 +132,19 @@ const LandingSearch = () => {
         return infantsButtons;
     };
 
-    const handleSearch = () =>{
-        if(!departCity.value || !destinationCity.value){
+    const handleSearch = () => {
+        if (!departCity.value || !destinationCity.value) {
             window.alert("Please fill in all required fields: Depart City, Arrival City, and Depart Date");
             return;
         }
 
-        if(departCity.value === destinationCity.value){
+        if (departCity.value === destinationCity.value) {
             window.alert("Depart City and Destination City Cannot be the Same");
             return;
         }
         const sessionToken = localStorage.getItem('TransactionStatus');
         const onwardDate = selectedDepartDate.toISOString().split('T')[0];
-        const returnDate = selectedReturnDate? selectedReturnDate.toISOString().split('T')[0]: '';
+        const returnDate = selectedReturnDate ? selectedReturnDate.toISOString().split('T')[0] : '';
 
         const urlParams = new URLSearchParams({
             actioncode: 'FSAPIV4',
@@ -174,8 +175,8 @@ const LandingSearch = () => {
     }
 
     return (
-        <div className='flex gap-3 text-white items-center pl-24 pt-10'>
-            <div className='flex flex-col text-left w-48 bg-white bg-opacity-10 p-2 rounded-md'>
+        <div className='flex flex-col sm:flex-row gap-3 text-white items-center pl-2 pr-2 sm:pl-24 sm:pt-10 sm:pr-0 '>
+            <div className='flex flex-col text-left w-full sm:w-48 bg-white bg-opacity-10 p-2 rounded-md'>
                 <div className="text-xs">From</div>
                 <Select
                     value={departCity}
@@ -205,7 +206,7 @@ const LandingSearch = () => {
                             ...provided,
                             maxHeight: '140px', // Adjust the max height as needed
                             overflowY: 'auto', // Enable vertical scrolling
-                            color:'black'
+                            color: 'black'
                         }),
                         placeholder: (provided) => ({
                             ...provided,
@@ -219,13 +220,13 @@ const LandingSearch = () => {
                             ...provided,
                             color: 'white',
                         }),
-                        
+
                         // You can add more styles as needed
                     }}
                 />
             </div>
 
-            <div className='flex flex-col text-left w-48 bg-white bg-opacity-10 p-2 rounded-md'>
+            <div className='flex flex-col text-left w-full sm:w-48 bg-white bg-opacity-10 p-2 rounded-md'>
                 <div className="text-xs">To</div>
                 <Select
                     value={destinationCity}
@@ -255,7 +256,7 @@ const LandingSearch = () => {
                             ...provided,
                             maxHeight: '140px', // Adjust the max height as needed
                             overflowY: 'auto', // Enable vertical scrolling
-                            color:'black'
+                            color: 'black'
                         }),
                         placeholder: (provided) => ({
                             ...provided,
@@ -269,41 +270,43 @@ const LandingSearch = () => {
                             ...provided,
                             color: 'white',
                         }),
-                        
+
                         // You can add more styles as needed
                     }}
 
                 />
             </div>
 
-            <div className='flex flex-col w-48 h-[70px]  bg-white bg-opacity-10 p-2 rounded-md'>
+            <div className='flex flex-col w-full sm:w-48 h-[70px]  bg-white bg-opacity-10 p-2 rounded-md'>
                 <div className="text-xs text-left">Depart</div>
                 <DatePicker
                     selected={selectedDepartDate}
                     onChange={handleDepartDateChange}
                     dateFormat='dd/MM/yyyy'
-                    className='flex font-normal bg-transparent text-sm text-white rounded-sm h-[35px] text-center border-b border-white'
+                    className='flex font-normal bg-transparent text-sm text-white rounded-sm h-[35px] w-full text-center border-b border-white'
                     popperClassName='date-picker-popper'
                     minDate={today}
                 />
-            </div>           
+            </div>
 
-            <div className='flex flex-col w-48 h-[70px] bg-white bg-opacity-10 p-2 rounded-md'>
+            <div className='flex flex-col w-full sm:w-48 h-[70px] bg-white bg-opacity-10 p-2 rounded-md'>
                 <div className="text-xs text-left">Return</div>
                 <DatePicker
                     selected={selectedReturnDate}
                     onChange={handleReturnDateChange}
                     dateFormat='dd/MM/yyyy'
-                    className='flex font-normal bg-transparent text-sm text-white rounded-sm h-[35px] text-center border-b border-white'
-                    minDate={selectedDepartDate || today}
+                    className='flex font-normal bg-transparent text-sm text-white rounded-sm h-[35px] w-full text-center border-b border-white'
+                    minDate={selectedDepartDate || today}   
                 />
             </div>
 
-                        <div className='flex flex-col w-48 h-[70px] bg-white bg-opacity-10 p-2 rounded-md'>
+            <div className='flex flex-col w-full sm:w-48 h-[70px] bg-white bg-opacity-10 p-2 rounded-md justify-center'>
                 <div className="text-xs text-left">Passenger/Class</div>
-                <div className="dropdown pt-1 text-left">
-                    <button className="btn btn-secondary dropdown-toggle text-black bg-white flex w-[180px] text-sm" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        {adults}A+{children}C+{infants}I | {travelClass}
+                <div className="dropdown pt-1 flex left-0">
+                    
+                    <button className="btn btn-secondary dropdown-toggle bg-transparent border-none flex w-full sm:w-[180px] sm:text-sm text-lg" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    {adults}A+{children}C+{infants}I | {travelClass}
+                        
                     </button>
                     <div className="dropdown-menu bg-red-100 rounded-lg" aria-labelledby="dropdownMenuButton">
                         <div className="dropdown-item hover:bg-transparent text-black">
@@ -346,8 +349,3 @@ const LandingSearch = () => {
 }
 
 export default LandingSearch;
-
-
-
-
-// {adults}A+{children}C+{infants}I | {travelClass}

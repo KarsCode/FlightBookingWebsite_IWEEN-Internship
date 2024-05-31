@@ -156,7 +156,6 @@
             };
             // Call the onTripDataSelect function with the trip data
             onTripDataSelect(tripData);
-            console.log(tripData)
         }
 
 

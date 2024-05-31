@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 
 import { useState, useEffect } from 'react';
@@ -5,8 +6,8 @@ import { useLocation } from 'react-router-dom';
 import FlightCard from './FlightCard';
 import { getUrlParams } from '../../utils/params';
 import './FlightList.css'
-
-const FlightList = () => {
+const FlightList = ({ filters }) => {
+    console.log(filters.selectedDepartTime)
     const location = useLocation();
     const [selectedButton, setSelectedButton] = useState('Cheapest Flights');
     const [flights, setFlights] = useState([]);
@@ -86,7 +87,7 @@ const FlightList = () => {
         if (selectedButton === 'Cheapest Flights') {
             setFlights([...flights].sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare));
         } else if (selectedButton === 'Shortest Duration') {
-            console.log(flights[0].flightlegs.length)
+            console.log(flights[0].flightlegs[0].flightnumber)
             setFlights([...flights].sort((a, b) => {
                 const totalDurationA = a.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
                 const totalDurationB = b.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
@@ -96,6 +97,7 @@ const FlightList = () => {
         }
         // console.log(flights[0].flightlegs.length)
     }, [selectedButton]);
+
 
     if (isLoading) {
         return (
@@ -107,36 +109,51 @@ const FlightList = () => {
     }
 
     return (
-        <div className="flex flex-col gap-2 w-5/6">
-            <div className="text-left text-4xl font-semibold text-white">
-                Flights from {flights[0].flightlegs[0].origin_name} to {flights[0].flightlegs[flights[0].flightlegs.length-1].destination_name}
+        <div className="flex flex-col gap-2 pl-2 pr-2 sm:pr-24 sm:pl-2">
+            <div className="text-left text-lg sm:text-4xl font-semibold sm:text-white">
+                Flights from {flights[0].flightlegs[0].origin_name} to {flights[0].flightlegs[flights[0].flightlegs.length - 1].destination_name}
             </div>
 
-            <div className="flex items-center h-[60px] bg-gray-300 rounded-xl">
+            <div className="flex items-center w-full h-[60px] bg-gray-300 rounded-xl">
                 <button
-                    className={`w-1/3 h-full rounded-xl text-center ${selectedButton === 'Cheapest Flights' ? 'bg-[#06539A] text-white' : 'bg-gray-300'} hover:bg-[#06539A] hover:text-white focus:outline-none`}
+                    className={`w-1/3 h-full rounded-xl text-center ${selectedButton === 'Cheapest Flights' ? 'bg-[#06539A] text-white' : 'bg-gray-300'} hover:bg-[#06539A] hover:text-white focus:outline-none p-2`}
                     onClick={() => handleButtonClick('Cheapest Flights')}
                 >
                     Cheapest Flights
                 </button>
                 <button
-                    className={`w-1/3 h-full rounded-md text-center ${selectedButton === 'Shortest Duration' ? 'bg-[#06539A] text-white' : 'bg-gray-300'} hover:bg-[#06539A] hover:text-white focus:outline-none`}
+                    className={`w-1/3 h-full rounded-md text-center ${selectedButton === 'Shortest Duration' ? 'bg-[#06539A] text-white' : 'bg-gray-300'} hover:bg-[#06539A] hover:text-white focus:outline-none p-2`}
                     onClick={() => handleButtonClick('Shortest Duration')}
                 >
                     Shortest Duration
                 </button>
                 <button
-                    className={`w-1/3 h-full rounded-xl text-center ${selectedButton === 'Departure Arrival' ? 'bg-[#06539A] text-white' : 'bg-gray-300'} hover:bg-[#06539A] hover:text-white focus:outline-none`}
+                    className={`w-1/3 h-full rounded-xl text-center ${selectedButton === 'Departure Arrival' ? 'bg-[#06539A] text-white' : 'bg-gray-300'} hover:bg-[#06539A] hover:text-white focus:outline-none p-2`}
                     onClick={() => handleButtonClick('Departure Arrival')}
                 >
                     Departure Arrival
                 </button>
             </div>
 
-            <div className='flex flex-col gap-3 pt-3'>
-                {flights.map((flight) => (
-                    <FlightCard key={flight.nextraflightkey} flight={flight} />
-                ))}
+            <div className='flex flex-col items-center gap-3 pt-3'>
+                {flights
+                    .filter(flight =>
+                        (!filters.selectedAirline || filters.selectedAirline === flight.flightlegs[0].validatingcarriername) &&
+                        flight.flightfare.totalbasefare <= filters.priceRange[1] &&
+                        (filters.selectedDepartTime.length === 0 || // Check if no departure time filter is applied
+                            (flight.flightlegs[0].deptime >= filters.selectedDepartTime[0] && // Check if departure time is greater than or equal to selectedDepartTime[0]
+                                flight.flightlegs[0].deptime <= filters.selectedDepartTime[1])) && // Check if departure time is less than or equal to selectedDepartTime[1]
+                        (filters.selectedArrivalTime.length === 0 || // Check if no arrival time filter is applied
+                            (flight.flightlegs[flight.flightlegs.length - 1].arrtime >= filters.selectedArrivalTime[0] && // Check if arrival time is greater than or equal to selectedArrivalTime[0]
+                                flight.flightlegs[flight.flightlegs.length - 1].arrtime <= filters.selectedArrivalTime[1])) && // Check if arrival time is less than or equal to selectedArrivalTime[1]
+                        (!filters.flightNumber || flight.flightlegs.some(leg => leg.flightnumber === filters.flightNumber))
+                    )
+                    .map(flight => (
+                        <FlightCard key={flight.nextraflightkey} flight={flight} />
+                    ))}
+
+
+
             </div>
         </div>
     );

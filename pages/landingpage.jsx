@@ -1,6 +1,6 @@
 import { useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { FaArrowUp } from 'react-icons/fa'; // Import the upward arrow icon
+import { FaArrowUp, FaBars } from 'react-icons/fa'; // Import the upward arrow icon
 import './landingpage.css';
 import LandingSearch from '../components/Landing/LandingSearch';
 import Filters from '../components/Landing/Filters';
@@ -11,6 +11,7 @@ const LandingPage = () => {
     const location = useLocation();
     // eslint-disable-next-line no-unused-vars
     const [tripData, setTripData] = useState(null);
+    const [isFiltersVisible, setIsFiltersVisible] = useState(false);
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
@@ -42,30 +43,69 @@ const LandingPage = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+
+    const [filters, setFilters] = useState({
+        selectedAirline: '',
+        priceRange: [1010, 9999],
+        selectedDepartTime: '',
+        selectedArrivalTime: '',
+        flightNumber: ''
+    });
+
+    const handleFilterChange = (newFilters) => {
+        setFilters(newFilters)
+    }
+
     return (
         <div>
-            <div className='gradient-bg'>
+            <div className='relative bg-custom-gradient h-full'>
                 <div className='flex flex-col pb-50'>
                     <div>
                         <LandingSearch />
                     </div>
+
                     <div className='flex gap-12'>
-                        <div className='pl-24 pt-20 pb-20'>
-                            <Filters />
+                        <div className='pl-24 pt-20 pb-20 hidden sm:block'>
+                            <Filters onFilterChange={handleFilterChange} />
                         </div>
                         <div className='mt-[65px] w-full'>
-                            <FlightList />
+                            <FlightList filters={filters}/>
                         </div>
                     </div>
                 </div>
             </div>
-            <button 
-                onClick={scrollToTop} 
-                className='fixed bottom-10 right-10 p-3 bg-[#06539A] border-3 border-orange-500 text-white rounded-full shadow-xl hover:bg-orange-500 hover:border-[#06539A] transition duration-400'
+            <button
+                onClick={scrollToTop}
+                className='fixed bottom-10 right-4 p-3 bg-[#06539A] border-3 border-orange-500 text-white rounded-full shadow-xl hover:bg-orange-500 hover:border-[#06539A] transition duration-400'
                 style={{ zIndex: 1000 }} // Ensures the button is always on top
             >
                 <FaArrowUp size={20} />
             </button>
+            <button
+                onClick={() => setIsFiltersVisible(!isFiltersVisible)}
+                className="fixed top-4 right-4 p-3 bg-[#06539A] text-white rounded-full shadow-xl active:scale-95 transition duration-400 sm:hidden flex gap-2 items-center"
+                style={{ zIndex: 1000 }} // Ensures the button is always on top
+            >
+                <FaBars size={10} />
+                <div className='text-xs'>
+                    Filter
+                </div>
+            </button>
+
+            {isFiltersVisible && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+                    <div className="bg-white p-4 rounded-lg shadow-lg w-11/12 h-3/4 overflow-auto flex-col items-center">
+                        <button
+                            onClick={() => setIsFiltersVisible(false)}
+                            className="mt-4 p-2 bg-orange-500 text-white rounded-full border-2 border-black active:scale-95 transition duration-300"
+                        >
+                            Close
+                        </button>
+                        <Filters onFilterChange={handleFilterChange} />
+
+                    </div>
+                </div>
+            )}
         </div>
     );
 }

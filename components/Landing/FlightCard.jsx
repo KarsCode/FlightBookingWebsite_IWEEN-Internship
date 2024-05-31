@@ -59,9 +59,10 @@ const FlightCard = ({ flight }) => {
     const lastLegIndex = flight.flightlegs.length - 1;
     const lastLeg = flight.flightlegs[lastLegIndex];
 
+
     return (
-        <div className="flex flex-col bg-white rounded-3xl gap-1">
-            <div className="flex gap-10 items-center justify-around pt-2">
+        <div className="flex flex-col bg-white rounded-3xl w-3/4 sm:w-full gap-1">
+            <div className="flex flex-col sm:flex-row gap-1 sm:gap-10 items-center justify-around pt-2">
                 {/* Logo and name */}
                 <div className="flex items-center gap-2 p-1">
                     <div className='w-16 h-16 flex items-center'>
@@ -113,7 +114,7 @@ const FlightCard = ({ flight }) => {
                 </div>
 
                 {/* Fare */}
-                <div className="flex flex-col pl-10">
+                <div className="flex flex-col sm:pl-10">
                     <div className="font-semibold text-xl text-[#06539A]">
                         {formatCurrency(flight.flightfare.totalbasefare)}
                     </div>
@@ -194,7 +195,7 @@ const FlightCard = ({ flight }) => {
                 </div>
             </div>
 
-            <div className="text-orange-500 text-sm text-left px-3">
+            <div className="text-orange-500 text-sm sm:text-left px-3">
                 Earn additional ₹ 83 Promo Cash
             </div>
         </div>

@@ -1,0 +1,15 @@
+@media (min-width: 1024px) {
+    .bg-custom-gradient {
+      background: linear-gradient(to bottom, #181818, #963701) no-repeat, #F2F2F2;
+      background-size: 100% 250px;
+      background-position: top;
+    }
+  }
+  
+  @media (max-width: 1024px) {
+    .bg-custom-gradient {
+      background: linear-gradient(to bottom, #181818, #963701) no-repeat, #F2F2F2;
+      background-size: 100% 500px;
+      background-position: top;
+    }
+  }

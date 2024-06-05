@@ -271,7 +271,7 @@
                                 selected={selectedReturnDate}
                                 onChange={handleReturnDateChange}
                                 dateFormat='dd/MM/yyyy'
-                                className={`font-semibold text-md ${tripMode === 'OneWay' ? 'bg-gray-300' : ''} border-b border-gray-400`}
+                                className={`font-semibold text-md ${tripMode === 'OneWay' ? 'bg-gray-300' : ''}`}
                                 popperClassName='date-picker-popper'
                                 minDate={selectedDepartDate}
                                 disabled={tripMode === 'OneWay'}

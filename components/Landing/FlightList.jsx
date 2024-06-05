@@ -1,3 +1,4 @@
+
 /* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -7,21 +8,24 @@ import FlightCard from './FlightCard';
 import { getUrlParams } from '../../utils/params';
 import './FlightList.css'
 const FlightList = ({ filters }) => {
-    const location = useLocation(); 
+    const location = useLocation();
     const [selectedButton, setSelectedButton] = useState('Cheapest Flights');
     const [flights, setFlights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
+ 
 
 
     const handleButtonClick = (buttonName) => {
         setSelectedButton(buttonName === selectedButton ? '' : buttonName);
     };
 
+
+
     useEffect(() => {
         const fetchFlights = async () => {
             const params = getUrlParams(location);
-            const carriers = ['6E'];
-            const allFlights = [];
+            const carriers = ['6E','SG','UK'];
+            let allFlights = [];
 
             for (const carrier of carriers) {
                 const xmlRequest = `
@@ -61,21 +65,30 @@ const FlightList = ({ filters }) => {
                 const sessionToken = localStorage.getItem('TransactionStatus');
                 const url = `https://b2b.jasyatra.com/v2dispatch.jsp?actioncode=FSAPIV4&agentid=SUPER&opid=FS000&sessiontoken=${sessionToken}&xmlorjson=${encodeURIComponent(xmlRequest)}`;
 
+                console.log('Fetching flights with request:', xmlRequest); // Debugging line
+
                 try {
                     const response = await fetch(url);
                     const data = await response.json();
+                    console.log('API Response:', data);     
+
                     const carrierFlights = data.flightsearchresponse.flightjourneys.flatMap(journey =>
                         journey.flightoptions.flatMap(option => option.recommendedflight)
                     );
-                    allFlights.push(...carrierFlights);
+                    console.log("Carrier Flights:", carrierFlights); 
+                    allFlights = [...allFlights, ...carrierFlights];
                 } catch (error) {
                     console.error('Error fetching flights:', error);
-                    setIsLoading(false);
                 }
             }
+
+            console.log('All Flights before sorting:', allFlights); 
             allFlights.sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare);
+            console.log('All Flights after sorting:', allFlights);
+
             setFlights(allFlights);
             setIsLoading(false);
+            console.log(flights); 
         };
 
         fetchFlights();
@@ -135,27 +148,30 @@ const FlightList = ({ filters }) => {
                 </button>
             </div>
 
-            <div className='flex flex-col items-center gap-3 pt-3'>
-                {flights
-                    .filter(flight =>
-                        (!filters.selectedAirline || filters.selectedAirline === flight.flightlegs[0].validatingcarriername) &&
-                        flight.flightfare.totalbasefare <= filters.priceRange[1] &&
-                        (filters.selectedDepartTime.length === 0 || // Check if no departure time filter is applied
-                            (flight.flightlegs[0].deptime >= filters.selectedDepartTime[0] && // Check if departure time is greater than or equal to selectedDepartTime[0]
-                                flight.flightlegs[0].deptime <= filters.selectedDepartTime[1])) && // Check if departure time is less than or equal to selectedDepartTime[1]
-                        (filters.selectedArrivalTime.length === 0 || // Check if no arrival time filter is applied
-                            (flight.flightlegs[flight.flightlegs.length - 1].arrtime >= filters.selectedArrivalTime[0] && // Check if arrival time is greater than or equal to selectedArrivalTime[0]
-                                flight.flightlegs[flight.flightlegs.length - 1].arrtime <= filters.selectedArrivalTime[1])) && // Check if arrival time is less than or equal to selectedArrivalTime[1]
-                        (!filters.flightNumber || flight.flightlegs.some(leg => leg.flightnumber === filters.flightNumber))
-                    )
-                    .map(flight => (
-                        <FlightCard key={flight.nextraflightkey} flight={flight} />
-
-                    ))}
-
-
-
+            <div className='flex flex-col items-center gap-3 pt-3 pb-3'>
+                {flights.length === 0 ? (
+                    <div className='text-xl font-semibold'>
+                        No Flights Found
+                    </div>
+                ) : (
+                    flights
+                        .filter(flight =>
+                            (!filters.selectedAirline || filters.selectedAirline === flight.flightlegs[0].validatingcarriername) &&
+                            flight.flightfare.totalbasefare <= filters.priceRange[1] &&
+                            (filters.selectedDepartTime.length === 0 || // Check if no departure time filter is applied
+                                (flight.flightlegs[0].deptime >= filters.selectedDepartTime[0] && // Check if departure time is greater than or equal to selectedDepartTime[0]
+                                    flight.flightlegs[0].deptime <= filters.selectedDepartTime[1])) && // Check if departure time is less than or equal to selectedDepartTime[1]
+                            (filters.selectedArrivalTime.length === 0 || // Check if no arrival time filter is applied
+                                (flight.flightlegs[flight.flightlegs.length - 1].arrtime >= filters.selectedArrivalTime[0] && // Check if arrival time is greater than or equal to selectedArrivalTime[0]
+                                    flight.flightlegs[flight.flightlegs.length - 1].arrtime <= filters.selectedArrivalTime[1])) && // Check if arrival time is less than or equal to selectedArrivalTime[1]
+                            (!filters.flightNumber || flight.flightlegs.some(leg => leg.flightnumber === filters.flightNumber))
+                        )
+                        .map(flight => (
+                            <FlightCard key={flight.nextraflightkey} flight={flight} />
+                        ))
+                )}
             </div>
+
         </div>
     );
 };

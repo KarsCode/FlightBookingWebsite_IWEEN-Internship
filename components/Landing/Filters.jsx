@@ -5,7 +5,7 @@ import { FaRegMoon } from 'react-icons/fa';
 // eslint-disable-next-line react/prop-types
 const Filters = ({ onFilterChange }) => {
   const [selectedAirline, setSelectedAirline] = useState('');
-  const [priceRange, setPriceRange] = useState([1010, 9999]);
+  const [priceRange, setPriceRange] = useState([1010, 40000]);
   const [selectedDepartTime, setSelectedDepartTime] = useState([]);
   const [selectedArrivalTime, setSelectedArrivalTime] = useState([]);
   const [selectedFarePolicy, setSelectedFarePolicy] = useState([]);
@@ -53,7 +53,6 @@ const Filters = ({ onFilterChange }) => {
     
   const handleArrivalTimeChange = (time) => {
     let timeRange = [];
-    // If the selected arrival time is already the same as the clicked time, clear the selection
     if (selectedArrivalTime.length === 2 && selectedArrivalTime[0] === timeRange[0] && selectedArrivalTime[1] === timeRange[1]) {
       setSelectedArrivalTime([]);
     } else {
@@ -92,7 +91,6 @@ const Filters = ({ onFilterChange }) => {
 
 
   useEffect(() => {
-    // Call the onFilterChange callback with the updated filter state
     onFilterChange({
       selectedAirline,
       priceRange,
@@ -158,7 +156,7 @@ const Filters = ({ onFilterChange }) => {
           <input
             type='range'
             min='1010'
-            max='9999'
+            max='40000'
             value={priceRange[1]}
             onChange={handlePriceRangeChange}
             className='w-full'

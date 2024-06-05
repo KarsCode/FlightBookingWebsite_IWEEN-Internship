@@ -3,6 +3,10 @@ import { useState } from 'react';
 import FlightDetails from './ModalFiles/FlightDetails';
 import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { IoClose } from "react-icons/io5";
+import FareSummary from './ModalFiles/FareSummary';
+import CancellationPolicy from './ModalFiles/CancellationPolicy';
+import ChangeDate from './ModalFiles/ChangeDate';
+import { Navigate } from 'react-router-dom';
 
 // Define a mapping for airline logos
 const airlineLogos = {
@@ -15,6 +19,7 @@ const airlineLogos = {
 const FlightCard = ({ flight }) => {
     const [activeTab, setActiveTab] = useState('');
     const [open, setOpen] = useState(false);
+    const [redirect, setRedirect] = useState(null);
 
     const handleTabChange = (tabName) => {
         setActiveTab(tabName);
@@ -23,6 +28,26 @@ const FlightCard = ({ flight }) => {
     const handleClose = () => {
         setOpen(false);
     };
+
+    const handleViewPrice = () => {
+        const sessionToken = localStorage.getItem('TransactionStatus');
+        const urlParams = new URLSearchParams({
+            actioncode: 'FSTAXESV4',
+            agentid: 'JY86528',
+            cachekeyow: flight.nextraflightkey,
+            opid: 'FS000',
+            resultformat: 'jsonv2',
+            sessiontoken: sessionToken,
+            triptype: 'oneway',
+            // Add other necessary parameters here based on flight data
+        });
+        const bookingUrl = `/booking?${urlParams.toString()}`;
+        setRedirect(bookingUrl);
+    };
+
+    if (redirect) {
+        return <Navigate to={redirect} />;
+    }
 
     const formatTime = (time) => {
         const hours = Math.floor(time / 100);
@@ -122,7 +147,7 @@ const FlightCard = ({ flight }) => {
                 {/* Book now */}
                 <div className="flex flex-col">
                     <div>
-                        <button className="border border-[#06539A] text-[#06539A] rounded-3xl px-5 py-2 shadow-md transition duration-300 ease-in-out hover:bg-[#06539A] hover:text-white">
+                        <button className="border border-[#06539A] text-[#06539A] rounded-3xl px-5 py-2 shadow-md transition duration-300 ease-in-out hover:bg-[#06539A] hover:text-white" onClick={handleViewPrice}>
                             View Price
                         </button>
                     </div>
@@ -134,11 +159,11 @@ const FlightCard = ({ flight }) => {
                         Flight Details
                     </button>
 
-                    <div className='l'>
-                    <Dialog open={open} onClose={handleClose} className=' lexend-deca font-normal'>
+                    <div className=''>
+                    <Dialog open={open} onClose={handleClose} className=' lexend-deca font-normal' maxWidth='md'>
                         <DialogTitle className='bg-white pb-2'>
                             <div className='flex gap-20 items-center justify-between'>
-                                <div className='lexend-deca font-normal'>
+                                <div className='lexend-deca font-semibold'>
                                     Flight Details
                                 </div>
                                 <div className='text-gray-500' onClick={handleClose}>
@@ -146,10 +171,10 @@ const FlightCard = ({ flight }) => {
                                 </div>
                             </div>
                         </DialogTitle>
-                        <DialogContent className='p-0'>
-                            <div className="flex bg-gray-200 w-full p-2 text-sm gap-3 h-[55px]">
+                        <DialogContent className='p-0 w-full'>
+                            <div className="flex bg-gray-200 p-2 text-sm gap-10 h-[55px] overflow-auto">
                                 <button
-                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'FlightDetails' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
+                                    className={`rounded-2xl sm:px-2 sm:py-1 px-6 focus:outline-none ${activeTab === 'FlightDetails' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
                                     onClick={() => handleTabChange('FlightDetails')}
                                 >
                                     Flight Details
@@ -180,20 +205,19 @@ const FlightCard = ({ flight }) => {
                             )}
                             {activeTab === 'FareSummary' && (
                                 <div>
-                                    {/* Your Fare Summary content here */}
-                                    Fare Summary
+                                    <FareSummary flight={flight}/>
                                 </div>
                             )}
                             {activeTab === 'Cancellation' && (
                                 <div>
                                     {/* Your Cancellation content here */}
-                                    Cancellation
+                                    <CancellationPolicy flight={flight}/>
                                 </div>
                             )}
                             {activeTab === 'ChangeDate' && (
                                 <div>
                                     {/* Your Change Date content here */}
-                                    Change Date
+                                    <ChangeDate flight={flight}/>
                                 </div>
                             )}
                         </DialogContent>

@@ -201,7 +201,7 @@
                         />
                         <div>{departCity ? departCity.value : ''}</div>
                     </div> 
-                    <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 pb-2 border-1 border-gray-300 rounded-md'>
+                    <div className='flex flex-col items-start font-light sm:w-[240px] sm:h-[104px] pl-2 pb-2 border-1 border-gray-300 rounded-md w-full'>
                         <div>Going To</div>
                         <Select
                             value={destinationCity}
@@ -243,14 +243,14 @@
                 </div>
 
                 <div className='flex flex-col sm:flex-row items-center sm:gap-[2px] gap-3'>
-                    <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 border-1 border-gray-300  rounded-md'>
+                    <div className='flex flex-col items-start font-light sm:w-[240px] sm:h-[104px] pl-2 border-1 border-gray-300  rounded-md'>
                         <div>Depart Date</div>
                         <div className='font-semibold'>
                             <DatePicker
                                 selected={selectedDepartDate}
                                 onChange={handleDepartDateChange}
                                 dateFormat='dd/MM/yyyy'
-                                className='font-semibold text-md'
+                                className='font-semibold text-md w-full'
                                 popperClassName='date-picker-popper'
                                 minDate={today}
                                 onCalendarOpen={() => handleDepartDatePickerToggle(true)}
@@ -271,7 +271,7 @@
                                 selected={selectedReturnDate}
                                 onChange={handleReturnDateChange}
                                 dateFormat='dd/MM/yyyy'
-                                className={`font-semibold text-md ${tripMode === 'OneWay' ? 'bg-gray-300' : ''}`}
+                                className={`font-semibold text-md ${tripMode === 'OneWay' ? 'bg-gray-300' : ''} w-full`}
                                 popperClassName='date-picker-popper'
                                 minDate={selectedDepartDate}
                                 disabled={tripMode === 'OneWay'}
@@ -287,7 +287,7 @@
                     </div>
 
                 </div>
-                <div className='flex flex-col items-start font-light w-[240px] sm:h-[104px] pl-2 border-1 border-gray-300  rounded-md'>
+                <div className='flex flex-col items-start font-light sm:w-[240px] sm:h-[104px] pl-2 border-1 border-gray-300 rounded-md'>
                     <div>Travellers, Class</div>
                     <div className="dropdown ">
                         <button className="btn btn-secondary dropdown-toggle text-black bg-white top-auto bottom-[100%]" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" onClick={() => { setIsDropdownOpen(!isDropdownOpen); handleTripDataSelect(); }}>

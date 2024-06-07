@@ -43,10 +43,13 @@ const LandingPage = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
+    const [maxPrice, setMaxPrice] = useState(40000);
+    console.log('LandingPage:',maxPrice)
+
 
     const [filters, setFilters] = useState({
         selectedAirline: '',
-        priceRange: [1010, 9999],
+        priceRange: [1010, 40000],
         selectedDepartTime: '',
         selectedArrivalTime: '',
         flightNumber: ''
@@ -66,10 +69,11 @@ const LandingPage = () => {
 
                     <div className='flex gap-12'>
                         <div className='pl-24 pt-20 pb-20 hidden sm:block'>
-                            <Filters onFilterChange={handleFilterChange} />
+                            <Filters onFilterChange={handleFilterChange} maxPrice={maxPrice} />
                         </div>
                         <div className='mt-[65px] w-full'>
-                            <FlightList filters={filters}/>
+                            {<FlightList filters={filters} onMaxPriceChange={setMaxPrice}/>}
+                            
                         </div>
                     </div>
                 </div>
@@ -101,7 +105,7 @@ const LandingPage = () => {
                         >
                             Close
                         </button>
-                        <Filters onFilterChange={handleFilterChange} />
+                        <Filters onFilterChange={handleFilterChange} maxPrice={maxPrice} />
 
                     </div>
                 </div>

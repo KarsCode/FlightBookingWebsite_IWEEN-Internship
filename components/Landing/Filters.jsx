@@ -3,9 +3,12 @@ import { useEffect, useState } from 'react';
 import { FaRegMoon } from 'react-icons/fa';
 
 // eslint-disable-next-line react/prop-types
-const Filters = ({ onFilterChange }) => {
+const Filters = ({ onFilterChange,maxPrice}) => {
+
+  console.log('Filters',maxPrice)
+
   const [selectedAirline, setSelectedAirline] = useState('');
-  const [priceRange, setPriceRange] = useState([1010, 40000]);
+  const [priceRange, setPriceRange] = useState([1010, maxPrice||40000]);
   const [selectedDepartTime, setSelectedDepartTime] = useState([]);
   const [selectedArrivalTime, setSelectedArrivalTime] = useState([]);
   const [selectedFarePolicy, setSelectedFarePolicy] = useState([]);
@@ -22,60 +25,65 @@ const Filters = ({ onFilterChange }) => {
   };
 
   const handlePriceRangeChange = (event) => {
-    const maxPrice = event.target.value;
-    setPriceRange([priceRange[0], maxPrice]);
+    const x = event.target.value;
+    setPriceRange([priceRange[0], x]);
   };
   const handleDepartTimeChange = (time) => {
     let timeRange = [];
-    // If the selected departure time is already the same as the clicked time, clear the selection
-    if (selectedDepartTime.length === 2 && selectedDepartTime[0] === timeRange[0] && selectedDepartTime[1] === timeRange[1]) {
+    switch (time) {
+      case '00-06':
+        timeRange = [0, 600];
+        break;
+      case '06-12':
+        timeRange = [600, 1200];
+        break;
+      case '12-18':
+        timeRange = [1200, 1800];
+        break;
+      case '18-24':
+        timeRange = [1800, 2400];
+        break;
+      default:
+        timeRange = [];
+    }
+    if (
+      selectedDepartTime.length === 2 &&
+      selectedDepartTime[0] === timeRange[0] &&
+      selectedDepartTime[1] === timeRange[1]
+    ) {
       setSelectedDepartTime([]);
     } else {
-      switch (time) {
-        case '00-06':
-          timeRange = [0, 600];
-          break;
-        case '06-12':
-          timeRange = [600, 1200];
-          break;
-        case '12-18':
-          timeRange = [1200, 1800];
-          break;
-        case '18-24':
-          timeRange = [1800, 2400];
-          break;
-        default:
-          timeRange = [];
-      }
       setSelectedDepartTime(timeRange);
     }
   };
-    
   const handleArrivalTimeChange = (time) => {
     let timeRange = [];
-    if (selectedArrivalTime.length === 2 && selectedArrivalTime[0] === timeRange[0] && selectedArrivalTime[1] === timeRange[1]) {
+    switch (time) {
+      case '00-06':
+        timeRange = [0, 600];
+        break;
+      case '06-12':
+        timeRange = [600, 1200];
+        break;
+      case '12-18':
+        timeRange = [1200, 1800];
+        break;
+      case '18-24':
+        timeRange = [1800, 2400];
+        break;
+      default:
+        timeRange = [];
+    }
+    if (
+      selectedArrivalTime.length === 2 &&
+      selectedArrivalTime[0] === timeRange[0] &&
+      selectedArrivalTime[1] === timeRange[1]
+    ) {
       setSelectedArrivalTime([]);
     } else {
-      switch (time) {
-        case '00-06':
-          timeRange = [0, 600];
-          break;
-        case '06-12':
-          timeRange = [600, 1200];
-          break;
-        case '12-18':
-          timeRange = [1200, 1800];
-          break;
-        case '18-24':
-          timeRange = [1800, 2400];
-          break;
-        default:
-          timeRange = [];
-      }
       setSelectedArrivalTime(timeRange);
     }
   };
-  
 
   const handleFarePolicyChange = (policy) => {
     if (selectedFarePolicy.includes(policy)) {
@@ -100,6 +108,8 @@ const Filters = ({ onFilterChange }) => {
       flightNumber
     });
   }, [selectedAirline, priceRange, selectedDepartTime, selectedArrivalTime, selectedFarePolicy, flightNumber]);
+
+ 
 
 
   return (

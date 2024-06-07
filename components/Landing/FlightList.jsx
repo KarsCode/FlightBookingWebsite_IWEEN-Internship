@@ -7,12 +7,12 @@ import { useLocation } from 'react-router-dom';
 import FlightCard from './FlightCard';
 import { getUrlParams } from '../../utils/params';
 import './FlightList.css'
-const FlightList = ({ filters }) => {
+const FlightList = ({ filters, onMaxPriceChange }) => {
     const location = useLocation();
     const [selectedButton, setSelectedButton] = useState('Cheapest Flights');
     const [flights, setFlights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
- 
+
 
 
     const handleButtonClick = (buttonName) => {
@@ -24,7 +24,7 @@ const FlightList = ({ filters }) => {
     useEffect(() => {
         const fetchFlights = async () => {
             const params = getUrlParams(location);
-            const carriers = ['6E','SG','UK'];
+            const carriers = ['6E', 'SG', 'UK'];
             let allFlights = [];
 
             for (const carrier of carriers) {
@@ -70,25 +70,26 @@ const FlightList = ({ filters }) => {
                 try {
                     const response = await fetch(url);
                     const data = await response.json();
-                    console.log('API Response:', data);     
 
                     const carrierFlights = data.flightsearchresponse.flightjourneys.flatMap(journey =>
                         journey.flightoptions.flatMap(option => option.recommendedflight)
-                    );
-                    console.log("Carrier Flights:", carrierFlights); 
+                    );  
                     allFlights = [...allFlights, ...carrierFlights];
                 } catch (error) {
                     console.error('Error fetching flights:', error);
                 }
             }
 
-            console.log('All Flights before sorting:', allFlights); 
+            console.log('All Flights before sorting:', allFlights);
             allFlights.sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare);
             console.log('All Flights after sorting:', allFlights);
 
             setFlights(allFlights);
             setIsLoading(false);
-            console.log(flights); 
+            console.log(flights);
+            const maxPrice = Math.max(...allFlights.map(flight => flight.flightfare.totalbasefare));
+            onMaxPriceChange(maxPrice);
+            console.log(maxPrice)
         };
 
         fetchFlights();

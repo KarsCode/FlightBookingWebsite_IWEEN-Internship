@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import Booking from '../components/Booking/Booking';
@@ -27,7 +28,8 @@ const BookingPage = () => {
         const apiUrl = `https://b2b.jasyatra.com/v2dispatch.jsp?${urlParams.toString()}`;
         const response = await fetch(apiUrl);
         const data = await response.json();
-        setFlightData(data);
+        setFlightData(data.NextraPricingResponseV4);
+        
       } catch (error) {
         console.error('Error fetching flight data:', error);
       }
@@ -39,7 +41,7 @@ const BookingPage = () => {
   return (
     <div className='relative bg-custom-gradient h-full'>
         <div>
-          <Booking/>
+          <Booking flightData ={flightData}/>
         </div>
     </div>
   );

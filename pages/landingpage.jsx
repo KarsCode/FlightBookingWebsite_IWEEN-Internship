@@ -11,7 +11,10 @@ const LandingPage = () => {
     const location = useLocation();
     // eslint-disable-next-line no-unused-vars
     const [tripData, setTripData] = useState(null);
+    //const[filters, setFilters] =useState(null);
     const [isFiltersVisible, setIsFiltersVisible] = useState(false);
+
+
 
     useEffect(() => {
         const searchParams = new URLSearchParams(location.search);
@@ -43,13 +46,10 @@ const LandingPage = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const [maxPrice, setMaxPrice] = useState(40000);
-    console.log('LandingPage:',maxPrice)
-
-
+    const [maxPrice, setMaxPrice] = useState(null);
     const [filters, setFilters] = useState({
         selectedAirline: '',
-        priceRange: [1010, 40000],
+        priceRange: [1010, maxPrice],
         selectedDepartTime: '',
         selectedArrivalTime: '',
         flightNumber: ''
@@ -69,11 +69,13 @@ const LandingPage = () => {
 
                     <div className='flex gap-12'>
                         <div className='pl-24 pt-20 pb-20 hidden sm:block'>
+
                             <Filters onFilterChange={handleFilterChange} maxPrice={maxPrice} />
+
                         </div>
                         <div className='mt-[65px] w-full'>
-                            {<FlightList filters={filters} onMaxPriceChange={setMaxPrice}/>}
-                            
+                            {<FlightList filters={filters} onMaxPriceChange={setMaxPrice} />}
+
                         </div>
                     </div>
                 </div>

@@ -1,0 +1,177 @@
+/* eslint-disable react/prop-types */
+
+
+const FlightDetails = ({ flight }) => {
+
+    const airlineLogos = {
+        'Indigo': '/IndiGo-Logo.png',
+        'Vistara': '/Vistara-Logo.png',
+        'Spicejet': '/SpiceJet-Logo.png',
+        // Add other airlines and their logos here
+    };
+
+    const departureDate = flight.flightlegs[0].depdate;
+    const journeyDuration = flight.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
+    const stopoverCount = flight.flightlegs.length - 1;
+    const stopoverText = stopoverCount === 0 ? 'Non-stop' : `${stopoverCount} Stop${stopoverCount > 1 ? 's' : ''}`;
+
+
+
+    const formatDate = (dateString) => {
+        const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-US', options);
+    };
+
+    const formatTime = (time) => {
+        const hours = Math.floor(time / 100);
+        const minutes = time % 100;
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const formattedHours = hours % 12 || 12;
+        const formattedMinutes = minutes.toString().padStart(2, '0');
+        return `${formattedHours}:${formattedMinutes} ${ampm}`;
+    };
+
+    const formatDuration = (duration) => {
+        const hours = Math.floor(duration / 60);
+        const minutes = duration % 60;
+        return `${hours}h ${minutes}min`;
+    };
+
+    const calculateStopoverTime = (currentLeg, nextLeg) => {
+        if (!nextLeg) return ''; // No stopover if it's the last leg
+
+        const currentArrivalTime = currentLeg.arrtime;
+        const nextDepartureTime = nextLeg.deptime;
+
+        // Parse hours and minutes from HHMM format
+        const currentArrivalHours = Math.floor(currentArrivalTime / 100);
+        const currentArrivalMinutes = currentArrivalTime % 100;
+
+        const nextDepartureHours = Math.floor(nextDepartureTime / 100);
+        const nextDepartureMinutes = nextDepartureTime % 100;
+
+        // Convert times to total minutes of the day
+        const currentArrivalTotalMinutes = currentArrivalHours * 60 + currentArrivalMinutes;
+        const nextDepartureTotalMinutes = nextDepartureHours * 60 + nextDepartureMinutes;
+
+        // Calculate stopover time in minutes
+        let stopoverTimeInMinutes;
+        if (nextDepartureTotalMinutes >= currentArrivalTotalMinutes) {
+            stopoverTimeInMinutes = nextDepartureTotalMinutes - currentArrivalTotalMinutes;
+        } else {
+            stopoverTimeInMinutes = (nextDepartureTotalMinutes + 24 * 60) - currentArrivalTotalMinutes;
+        }
+
+        // Convert stopover time to hours and minutes format
+        const hours = Math.floor(stopoverTimeInMinutes / 60);
+        const minutes = stopoverTimeInMinutes % 60;
+
+        return `${hours}h ${minutes}min`;
+    };
+
+    return (
+        <div className="flex flex-col bg-white shadow-sm p-4 border-2 border-gray-100 rounded-md">
+            <div className="flex justify-between pb-8 border-b-2 border-gray-300">
+                <div className="flex flex-col text-left">
+                    <div className="font-semibold text-xl">
+                        {flight.flightlegs[0].origin_name} ({flight.flightlegs[0].origin}) → {flight.flightlegs[flight.flightlegs.length - 1].destination_name} ({flight.flightlegs[flight.flightlegs.length - 1].destination})
+                    </div>
+                    <div className="text-sm text-gray-400">
+                        One Way | {formatDate(departureDate)} | {stopoverText} | {formatDuration(journeyDuration)}
+                    </div>
+                </div>
+
+                <div className="flex items-center sm:p-2 text-sm text-white bg-[#06539A] rounded-md">
+                    <button>
+                        View Fare Rules
+                    </button>
+                </div>
+            </div>
+
+            {flight.flightlegs.map((leg, index) => (
+                <div key={index} className="flex flex-col gap-3 pt-3">
+                    <div className="flex gap-3">
+                        <div>
+                            <img
+                                src={airlineLogos[leg.validatingcarriername]}
+                                width="70"
+                                alt="Airline logo"
+                                className="rounded-md"
+                            />
+                        </div>
+                        <div className="flex flex-col text-left">
+                            <div className="flex items-center gap-2 text-sm">
+                                <div className="uppercase text-orange-500">
+                                    {leg.validatingcarriername}
+                                </div>
+                                <div>
+                                    {leg.validatingcarrier}-{leg.flightnumber}
+                                </div>
+                            </div>
+                            <div className="text-gray-400 uppercase text-sm">
+                                {leg.cabinclass}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="p-3">
+                        <div className="flex flex-col text-left">
+                            <div className="flex items-center gap-2">
+                                <div className="font-semibold">
+                                    {formatTime(leg.deptime)} - {leg.origin_name} {leg.depterminal} Terminal: {leg.depterminal}
+                                </div>
+                                <div className="text-gray-400">
+                                    | {formatDate(leg.depdate)}
+                                </div>
+                            </div>
+
+                            <div className="text-sm text-gray-400">
+                                Travel Time: {formatDuration(leg.journeyduration)}
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <div className="font-semibold">
+                                    {formatTime(leg.arrtime)} - {leg.destination_name} - Terminal: {leg.arrterminal}
+                                </div>
+                                <div className="text-gray-400">
+                                    | {formatDate(leg.arrdate)}
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div className="flex gap-3 pt-4">
+                            <div className="text-gray-400 border-2 border-gray-300 rounded-md">
+                                <div className="p-1">
+                                    Paid Meal
+                                </div>
+                            </div>
+                            <div className="text-gray-400 border-2 border-gray-300 rounded-md">
+                                <div className="p-1">
+                                    Check In:
+                                </div>
+                            </div>
+                            <div className="text-gray-400 border-2 border-gray-300 rounded-md">
+                                <div className="p-1">
+                                    Hand Baggage:
+                                </div>
+                            </div>
+
+                        </div>
+
+                        {index < flight.flightlegs.length - 1 && (
+                            <div className="text-sm pt-4 w-full text-blue-500 flex justify-center ">
+                                <div className='bg-gray-200 w-full p-1'>
+                                    Stopover Time: {calculateStopoverTime(leg, flight.flightlegs[index + 1])}
+                                </div>
+                            </div>
+                        )}
+
+                    </div>
+                </div>
+            ))}
+        </div>
+    )
+}
+
+export default FlightDetails

@@ -1,4 +1,3 @@
-
 /* eslint-disable react/prop-types */
 /* eslint-disable react-hooks/exhaustive-deps */
 
@@ -7,24 +6,22 @@ import { useLocation } from 'react-router-dom';
 import FlightCard from './FlightCard';
 import { getUrlParams } from '../../utils/params';
 import './FlightList.css'
+
 const FlightList = ({ filters, onMaxPriceChange }) => {
     const location = useLocation();
     const [selectedButton, setSelectedButton] = useState('Cheapest Flights');
     const [flights, setFlights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
-
-
+    const [showNetFare, setShowNetFare] = useState(false);
 
     const handleButtonClick = (buttonName) => {
         setSelectedButton(buttonName === selectedButton ? '' : buttonName);
     };
 
-
-
     useEffect(() => {
         const fetchFlights = async () => {
             const params = getUrlParams(location);
-            const carriers = ['6E', 'SG', 'UK'];
+            const carriers = ['6E'];
             let allFlights = [];
 
             for (const carrier of carriers) {
@@ -65,31 +62,29 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
                 const sessionToken = localStorage.getItem('TransactionStatus');
                 const url = `https://b2b.jasyatra.com/v2dispatch.jsp?actioncode=FSAPIV4&agentid=SUPER&opid=FS000&sessiontoken=${sessionToken}&xmlorjson=${encodeURIComponent(xmlRequest)}`;
 
-                console.log('Fetching flights with request:', xmlRequest); // Debugging line
-
                 try {
                     const response = await fetch(url);
                     const data = await response.json();
 
-                    const carrierFlights = data.flightsearchresponse.flightjourneys.flatMap(journey =>
-                        journey.flightoptions.flatMap(option => option.recommendedflight)
-                    );  
+                    const carrierFlights = data.flightsearchresponse.flightjourneys?.flatMap(journey =>
+                        journey.flightoptions?.flatMap(option => option.recommendedflight) || []
+                    ) || [];
+
                     allFlights = [...allFlights, ...carrierFlights];
                 } catch (error) {
                     console.error('Error fetching flights:', error);
                 }
             }
 
-            console.log('All Flights before sorting:', allFlights);
             allFlights.sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare);
-            console.log('All Flights after sorting:', allFlights);
 
             setFlights(allFlights);
             setIsLoading(false);
-            console.log(flights);
-            const maxPrice = Math.max(...allFlights.map(flight => flight.flightfare.totalbasefare));
-            onMaxPriceChange(maxPrice);
-            console.log(maxPrice)
+
+            if (allFlights.length > 0) {
+                const maxPrice = Math.max(...allFlights.map(flight => flight.flightfare.totalbasefare));
+                onMaxPriceChange(maxPrice);
+            }
         };
 
         fetchFlights();
@@ -99,22 +94,33 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
         if (selectedButton === 'Cheapest Flights') {
             setFlights([...flights].sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare));
         } else if (selectedButton === 'Shortest Duration') {
-            console.log(flights[0].flightlegs[0].flightnumber)
             setFlights([...flights].sort((a, b) => {
-                const totalDurationA = a.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
-                const totalDurationB = b.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
+                const totalDurationA = a.flightlegs?.reduce((total, leg) => total + leg.journeyduration, 0) || 0;
+                const totalDurationB = b.flightlegs?.reduce((total, leg) => total + leg.journeyduration, 0) || 0;
                 return totalDurationA - totalDurationB;
             }));
-
         }
     }, [selectedButton]);
 
+    const filteredFlights = flights.filter(flight =>
+        (!filters.selectedAirline || filters.selectedAirline === flight.flightlegs[0]?.validatingcarriername) &&
+        flight.flightfare.totalbasefare <= filters.priceRange[1] &&
+        (filters.selectedDepartTime.length === 0 || (
+            flight.flightlegs[0]?.deptime >= filters.selectedDepartTime[0] &&
+            flight.flightlegs[0]?.deptime <= filters.selectedDepartTime[1]
+        )) &&
+        (filters.selectedArrivalTime.length === 0 || (
+            flight.flightlegs[flight.flightlegs.length - 1]?.arrtime >= filters.selectedArrivalTime[0] &&
+            flight.flightlegs[flight.flightlegs.length - 1]?.arrtime <= filters.selectedArrivalTime[1]
+        )) &&
+        (!filters.flightNumber || flight.flightlegs.some(leg => leg.flightnumber === filters.flightNumber))
+    );
 
     if (isLoading) {
         return (
             <div className='flex flex-col items-center justify-center sm:h-1/3 h-[250px] gap-12'>
                 <div className='font-semibold text-xl sm:hidden'>
-                    Loding Flights
+                    Loading Flights
                 </div>
                 <div className='loader sm:mt-80'>
                 </div>
@@ -122,12 +128,20 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
         );
     }
 
+    const toggleNetFare = () => {
+        setShowNetFare(!showNetFare);
+    };
+
     return (
         <div className="flex flex-col gap-2 pl-2 pr-2 sm:pr-24 sm:pl-2">
-            <div className="text-left text-lg sm:text-4xl font-semibold sm:text-white">
-                Flights from {flights[0].flightlegs[0].origin_name} to {flights[0].flightlegs[flights[0].flightlegs.length - 1].destination_name}
-            </div>
-
+            {flights.length > 0 && (
+                <div className='flex flex-row justify-between'>
+                <div className="text-left text-lg sm:text-4xl font-semibold sm:text-white">
+                    Flights from {flights[0].flightlegs[0]?.origin_name || 'Unknown'} to {flights[0].flightlegs[flights[0].flightlegs.length - 1]?.destination_name || 'Unknown'}
+                </div>
+                <div className='text-white font-semibold' onClick={toggleNetFare}> {showNetFare ? 'Hide Net Fare' : 'Show Net Fare'}</div>
+                </div>
+            )}
             <div className="flex items-center w-full h-[60px] bg-gray-300 rounded-xl">
                 <button
                     className={`w-1/3 h-full rounded-xl text-center ${selectedButton === 'Cheapest Flights' ? 'bg-[#06539A] text-white' : 'bg-gray-300'} hover:bg-[#06539A] hover:text-white focus:outline-none p-2`}
@@ -148,31 +162,18 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
                     Departure Arrival
                 </button>
             </div>
-
             <div className='flex flex-col items-center gap-3 pt-3 pb-3'>
-                {flights.length === 0 ? (
-                    <div className='text-xl font-semibold'>
-                        No Flights Found
+                {filteredFlights.length === 0 ? (
+                    <div className='text-xl font-semibold flex flex-col bg-white border-b-2 rounded-md p-10'>
+                            <div className='text-red-400'>No Flights Found :(</div>
+                            <div className='text-sm'>Please change your filter criteria or Reload Page and try again.</div>
                     </div>
                 ) : (
-                    flights
-                        .filter(flight =>
-                            (!filters.selectedAirline || filters.selectedAirline === flight.flightlegs[0].validatingcarriername) &&
-                            flight.flightfare.totalbasefare <= filters.priceRange[1] &&
-                            (filters.selectedDepartTime.length === 0 || // Check if no departure time filter is applied
-                                (flight.flightlegs[0].deptime >= filters.selectedDepartTime[0] && // Check if departure time is greater than or equal to selectedDepartTime[0]
-                                    flight.flightlegs[0].deptime <= filters.selectedDepartTime[1])) && // Check if departure time is less than or equal to selectedDepartTime[1]
-                            (filters.selectedArrivalTime.length === 0 || // Check if no arrival time filter is applied
-                                (flight.flightlegs[flight.flightlegs.length - 1].arrtime >= filters.selectedArrivalTime[0] && // Check if arrival time is greater than or equal to selectedArrivalTime[0]
-                                    flight.flightlegs[flight.flightlegs.length - 1].arrtime <= filters.selectedArrivalTime[1])) && // Check if arrival time is less than or equal to selectedArrivalTime[1]
-                            (!filters.flightNumber || flight.flightlegs.some(leg => leg.flightnumber === filters.flightNumber))
-                        )
-                        .map(flight => (
-                            <FlightCard key={flight.nextraflightkey} flight={flight} />
-                        ))
+                    filteredFlights.map(flight => (
+                        <FlightCard key={flight.nextraflightkey} flight={flight} showNetFare ={showNetFare} />
+                    ))
                 )}
             </div>
-
         </div>
     );
 };

@@ -4,9 +4,8 @@ import FlightDetails from './ModalFiles/FlightDetails';
 import { Dialog, DialogTitle, DialogContent } from '@mui/material';
 import { IoClose } from "react-icons/io5";
 import FareSummary from './ModalFiles/FareSummary';
-import CancellationPolicy from './ModalFiles/CancellationPolicy';
-import ChangeDate from './ModalFiles/ChangeDate';
 import { Navigate } from 'react-router-dom';
+import FareRules from './ModalFiles/FareRules';
 
 // Define a mapping for airline logos
 const airlineLogos = {
@@ -16,7 +15,7 @@ const airlineLogos = {
     // Add other airlines and their logos here
 };
 
-const FlightCard = ({ flight }) => {
+const FlightCard = ({ flight,showNetFare }) => {
     const [activeTab, setActiveTab] = useState('');
     const [open, setOpen] = useState(false);
     const [redirect, setRedirect] = useState(null);
@@ -139,9 +138,10 @@ const FlightCard = ({ flight }) => {
                     <div className="font-semibold text-xl text-[#06539A]">
                         {formatCurrency(flight.flightfare.totalbasefare)}
                     </div>
-                    <div className="text-gray-400 text-xs text-left">
-                        {/* Original Fare Placeholder */}
-                    </div>
+                    {showNetFare && (<div className="text-gray-400 text-sm text-left">
+                        {formatCurrency(flight.flightfare.totalnet)}
+                    </div>)}
+                    
                 </div>
 
                 {/* Book now */}
@@ -186,16 +186,10 @@ const FlightCard = ({ flight }) => {
                                     Fare Summary
                                 </button>
                                 <button
-                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'Cancellation' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
-                                    onClick={() => handleTabChange('Cancellation')}
+                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'FareRules' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
+                                    onClick={() => handleTabChange('FareRules')}
                                 >
-                                    Cancellation
-                                </button>
-                                <button
-                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'ChangeDate' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
-                                    onClick={() => handleTabChange('ChangeDate')}
-                                >
-                                    Change Date
+                                    Fare Rules
                                 </button>
                             </div>
 
@@ -208,16 +202,9 @@ const FlightCard = ({ flight }) => {
                                     <FareSummary flight={flight}/>
                                 </div>
                             )}
-                            {activeTab === 'Cancellation' && (
+                            {activeTab === 'FareRules' && (
                                 <div>
-                                    {/* Your Cancellation content here */}
-                                    <CancellationPolicy flight={flight}/>
-                                </div>
-                            )}
-                            {activeTab === 'ChangeDate' && (
-                                <div>
-                                    {/* Your Change Date content here */}
-                                    <ChangeDate flight={flight}/>
+                                    <FareRules flight={flight}/>
                                 </div>
                             )}
                         </DialogContent>

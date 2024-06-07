@@ -2,7 +2,7 @@
 /* eslint-disable react/prop-types */
 import React from 'react'
 
-const CancellationPolicy = ({ flight }) => {
+const FareRules = ({ flight }) => {
 
     const airlineLogos = {
         'Indigo': '/IndiGo-Logo.png',
@@ -60,4 +60,4 @@ const CancellationPolicy = ({ flight }) => {
     )
 }
 
-export default CancellationPolicy
+export default FareRules

@@ -3,12 +3,12 @@ import { useEffect, useState } from 'react';
 import { FaRegMoon } from 'react-icons/fa';
 
 // eslint-disable-next-line react/prop-types
-const Filters = ({ onFilterChange,maxPrice}) => {
+const Filters = ({ onFilterChange, maxPrice }) => {
 
-  console.log('Filters',maxPrice)
+  console.log('Filters', maxPrice)
 
   const [selectedAirline, setSelectedAirline] = useState('');
-  const [priceRange, setPriceRange] = useState([1010, maxPrice||40000]);
+  const [priceRange, setPriceRange] = useState([1010, maxPrice || 40000]);
   const [selectedDepartTime, setSelectedDepartTime] = useState([]);
   const [selectedArrivalTime, setSelectedArrivalTime] = useState([]);
   const [selectedFarePolicy, setSelectedFarePolicy] = useState([]);
@@ -26,7 +26,7 @@ const Filters = ({ onFilterChange,maxPrice}) => {
 
   const handlePriceRangeChange = (event) => {
     const x = event.target.value;
-    setPriceRange([priceRange[0], x]);
+    setPriceRange([priceRange[0], parseInt(x, 10)]);
   };
   const handleDepartTimeChange = (time) => {
     let timeRange = [];
@@ -109,7 +109,6 @@ const Filters = ({ onFilterChange,maxPrice}) => {
     });
   }, [selectedAirline, priceRange, selectedDepartTime, selectedArrivalTime, selectedFarePolicy, flightNumber]);
 
- 
 
 
   return (
@@ -166,7 +165,7 @@ const Filters = ({ onFilterChange,maxPrice}) => {
           <input
             type='range'
             min='1010'
-            max='40000'
+            max={maxPrice}
             value={priceRange[1]}
             onChange={handlePriceRangeChange}
             className='w-full'
@@ -184,11 +183,12 @@ const Filters = ({ onFilterChange,maxPrice}) => {
       </div>
 
 
+
       <div className='p-4 border-b border-gray-300'>
         <div className='text-md font-semibold mb-2 text-left'>Departure Time</div>
         <div className='grid grid-cols-2 gap-4'>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime[0] === 0? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedDepartTime[0] === 0 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleDepartTimeChange(selectedDepartTime === '00-06' ? '' : '00-06')}
           >
             <img src='/sunrise.png' width='25' height='5' />
@@ -227,28 +227,28 @@ const Filters = ({ onFilterChange,maxPrice}) => {
         <div className='text-md font-semibold mb-2 text-left'>Arrival Time</div>
         <div className='grid grid-cols-2 gap-4'>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0]===0 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0] === 0 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleArrivalTimeChange(selectedArrivalTime === '00-06' ? '' : '00-06')}
           >
             <img src='/sunrise.png' width='25' height='5' />
             <span>00 - 06</span>
           </button>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0]===600 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0] === 600 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleArrivalTimeChange(selectedArrivalTime === '06-12' ? '' : '06-12')}
           >
             <img src='/sunup.png' width='25' height='5' />
             <span>06 - 12</span>
           </button>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0]===1200 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0] === 1200 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleArrivalTimeChange(selectedArrivalTime === '12-18' ? '' : '12-18')}
           >
             <img src='/sunset.png' width='25' height='5' />
             <span>12 - 18</span>
           </button>
           <button
-            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0]===1800 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
+            className={`flex rounded-full items-center gap-1 text-xs p-1 w-[80px] h-[35px] text-center ${selectedArrivalTime[0] === 1800 ? 'bg-blue-500 text-white' : 'bg-gray-300'}`}
             onClick={() => handleArrivalTimeChange(selectedArrivalTime === '18-24' ? '' : '18-24')}
           >
             <FaRegMoon size={20} />

@@ -155,6 +155,19 @@ const Filters = ({ onFilterChange, maxPrice }) => {
               Vistara
             </label>
           </div>
+          <div className='form-check'>
+            <input
+              className='form-check-input'
+              type='checkbox'
+              value='Akasa Air'
+              id='airlineAkasa'
+              checked={selectedAirline === 'Akasa Air'}
+              onChange={handleAirlineChange}
+            />
+            <label className='form-check-label' htmlFor='airlineVistara'>
+              Akasa
+            </label>
+          </div>
         </div>
       </div>
 

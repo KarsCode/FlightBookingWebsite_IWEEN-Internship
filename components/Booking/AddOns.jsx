@@ -28,7 +28,7 @@ const AddOns = () => {
                             </div>
                         </div>
                         <div className='sm:w-1/4 w-full border-2 border-blue-400 flex justify-center rounded-md'>
-                            <div className='p-3 flex items-center justify-around gap-4'>
+                            <div className='p-3 flex items-center justify-around gap-4'>    
                                 <IoIosOptions className='text-orange-500' size={30} />
                                 Other SSR
                             </div>

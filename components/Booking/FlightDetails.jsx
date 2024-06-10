@@ -1,5 +1,7 @@
 /* eslint-disable react/prop-types */
 
+import { useEffect, useState } from "react";
+import Modal from 'react-bootstrap/Modal'
 
 const FlightDetails = ({ flight }) => {
 
@@ -7,6 +9,7 @@ const FlightDetails = ({ flight }) => {
         'Indigo': '/IndiGo-Logo.png',
         'Vistara': '/Vistara-Logo.png',
         'Spicejet': '/SpiceJet-Logo.png',
+        'Akasa Air': '/Akasa-Logo.png'
         // Add other airlines and their logos here
     };
 
@@ -14,7 +17,26 @@ const FlightDetails = ({ flight }) => {
     const journeyDuration = flight.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
     const stopoverCount = flight.flightlegs.length - 1;
     const stopoverText = stopoverCount === 0 ? 'Non-stop' : `${stopoverCount} Stop${stopoverCount > 1 ? 's' : ''}`;
+    const [opid, setOpid] = useState('');
+    const [flightkey, setFlightkey] = useState('')
+    const [showModal, setShowModal] = useState(false);
+    const [fareRules, setFareRules] = useState(null);
 
+    // Fetch opid from URL parameter
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const opidParam = params.get('opid');
+        if (opidParam) {
+            setOpid(opidParam);
+        }
+        const flightkeyParam = params.get('cachekeyow');
+        if (flightkeyParam) {
+            setFlightkey(flightkeyParam)
+        }
+    }, []);
+
+    const openModal = () => setShowModal(true);
+    const closeModal = () => setShowModal(false);
 
 
     const formatDate = (dateString) => {
@@ -69,6 +91,50 @@ const FlightDetails = ({ flight }) => {
         return `${hours}h ${minutes}min`;
     };
 
+
+    const handleViewFareRules = async () => {
+        const sessionToken = localStorage.getItem('TransactionStatus'); // Retrieve session token from localStorage
+
+        // Construct API request parameters
+        const params = new URLSearchParams({
+            actioncode: 'GETFARERULES',
+            agentid: 'SUPER',
+            farerulejson: JSON.stringify({
+                farerulerequest: {
+                    selectedflight: flightkey,
+                    selectedflight_return: "",
+                    domint: "domestic"
+                }
+            }),
+            opid: opid,
+            sessiontoken: sessionToken
+        });
+
+        const apiUrl = `https://b2b.jasyatra.com/v2dispatch.jsp?${params}`;
+
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            console.log('Fare rules:', data);
+            setFareRules(data.farerules_html[0]); // Log the received information
+            console.log(fareRules)
+        } catch (error) {
+            console.error('Error fetching fare rules:', error);
+        }
+    };
+
+    const parseBaggageWeight = (bagweight) => {
+        if (!bagweight) {
+            return 'N/A';
+        }
+        const adtMatch = bagweight.match(/ADT@(\d+)/);
+        return adtMatch ? `${adtMatch[1]}kg` : 'N/A';
+    };
+
+    if (!flight) {
+        return <div className="text-white">Loading</div>;
+    }
+
     return (
         <div className="flex flex-col bg-white shadow-sm p-4 border-2 border-gray-100 rounded-md">
             <div className="flex justify-between pb-8 border-b-2 border-gray-300">
@@ -82,12 +148,21 @@ const FlightDetails = ({ flight }) => {
                 </div>
 
                 <div className="flex items-center sm:p-2 text-sm text-white bg-[#06539A] rounded-md">
-                    <button>
+                    <button onClick={() => { handleViewFareRules(); openModal(); }}>
                         View Fare Rules
                     </button>
+                    <Modal show={showModal} onHide={closeModal} size="xl">
+                        <Modal.Header closeButton>
+                            <Modal.Title>Fare Rules</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            {fareRules && (
+                                <div className="overflow-auto " dangerouslySetInnerHTML={{ __html: JSON.parse(fareRules).html }} />
+                            )}
+                        </Modal.Body>
+                    </Modal>
                 </div>
             </div>
-
             {flight.flightlegs.map((leg, index) => (
                 <div key={index} className="flex flex-col gap-3 pt-3">
                     <div className="flex gap-3">
@@ -141,21 +216,13 @@ const FlightDetails = ({ flight }) => {
                         </div>
 
                         <div className="flex gap-3 pt-4">
+                            
                             <div className="text-gray-400 border-2 border-gray-300 rounded-md">
                                 <div className="p-1">
-                                    Paid Meal
+                                    Check In: {parseBaggageWeight(leg.bagweight)}
                                 </div>
                             </div>
-                            <div className="text-gray-400 border-2 border-gray-300 rounded-md">
-                                <div className="p-1">
-                                    Check In:
-                                </div>
-                            </div>
-                            <div className="text-gray-400 border-2 border-gray-300 rounded-md">
-                                <div className="p-1">
-                                    Hand Baggage:
-                                </div>
-                            </div>
+                           
 
                         </div>
 

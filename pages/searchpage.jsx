@@ -38,10 +38,14 @@ const SearchPage = () => {
             return;
         }
 
+        console.log('Trip Mode',tripData.tripMode)
+
         // If all checks pass, construct the URL with search parameters
         const sessionToken = localStorage.getItem('TransactionStatus');
         const onwardDate = tripData.selectedDepartDate.toISOString().split('T')[0];
         const returnDate = tripData.selectedReturnDate ? tripData.selectedReturnDate.toISOString().split('T')[0] : '';
+
+        console.log('searchpage: ',tripData.tripMode)
 
         const urlParams = new URLSearchParams({
             actioncode: 'FSAPIV4',
@@ -55,7 +59,7 @@ const SearchPage = () => {
             numadults: tripData.adults,
             numchildren: tripData.children,
             numinfants: tripData.infants,
-            journeytype: 'OneWay',
+            journeytype: tripData.tripMode,
             prefclass: 'Y',
             requestformat: 'JSON',
             resultformat: 'JSON',

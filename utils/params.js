@@ -9,6 +9,7 @@ export const getUrlParams = (location) => {
         numchildren: searchParams.get('numchildren'),
         numinfants: searchParams.get('numinfants'),
         prefclass: searchParams.get('prefclass'),
-        sessiontoken: searchParams.get('sessiontoken')
+        sessiontoken: searchParams.get('sessiontoken'),
+        journeytype: searchParams.get('journeytype')
     };
 };

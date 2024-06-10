@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
     /* eslint-disable no-unused-vars */
     import { useEffect, useState } from 'react';
     import DatePicker from 'react-datepicker';
@@ -153,6 +154,7 @@
                 travelClass,
                 departCity,
                 destinationCity,
+                tripMode,
             };
             // Call the onTripDataSelect function with the trip data
             onTripDataSelect(tripData);

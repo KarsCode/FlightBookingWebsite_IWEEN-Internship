@@ -3,7 +3,7 @@ import { useState } from "react";
 import RoundTrip from './Flight/RoundTrip';
 
 const FlightModal = ({ onTripDataSelect }) => {
-    const [selectedOption, setSelectedOption] = useState('oneway');
+    const [selectedOption, setSelectedOption] = useState('OneWay');
 
     const handleRadioChange = (event) => {
         setSelectedOption(event.target.value);
@@ -17,14 +17,14 @@ const FlightModal = ({ onTripDataSelect }) => {
                         className="form-check-input"
                         type="radio"
                         name="exampleRadios"
-                        id="oneway"
-                        value="oneway"
-                        checked={selectedOption === 'oneway'}
+                        id="OneWay"
+                        value="OneWay"
+                        checked={selectedOption === 'OneWay'}
                         onChange={handleRadioChange}
                     />
                     <label
-                        className={`form-check-label ${selectedOption === 'oneway' ? 'font-bold' : 'font-normal'}`}
-                        htmlFor="oneway"
+                        className={`form-check-label ${selectedOption === 'OneWay' ? 'font-bold' : 'font-normal'}`}
+                        htmlFor="OneWay"
                     >
                         One way
                     </label>
@@ -34,22 +34,22 @@ const FlightModal = ({ onTripDataSelect }) => {
                         className="form-check-input"
                         type="radio"
                         name="exampleRadios"
-                        id="roundtrip"
-                        value="roundtrip"
-                        checked={selectedOption === 'roundtrip'}
+                        id="RoundTrip"
+                        value="RoundTrip"
+                        checked={selectedOption === 'RoundTrip'}
                         onChange={handleRadioChange}
                     />
                     <label
-                        className={`form-check-label ${selectedOption === 'roundtrip' ? 'font-bold' : 'font-normal'}`}
-                        htmlFor="roundtrip"
+                        className={`form-check-label ${selectedOption === 'RoundTrip' ? 'font-bold' : 'font-normal'}`}
+                        htmlFor="RoundTrip"
                     >
                         Round Trip
                     </label>
                 </div>
             </div>
 
-            {selectedOption === 'oneway' && <RoundTrip tripMode={'OneWay'} onTripDataSelect={onTripDataSelect} />}
-            {selectedOption === 'roundtrip' && <RoundTrip tripMode={'RoundTrip'} onTripDataSelect={onTripDataSelect} />}
+            {selectedOption === 'OneWay' && <RoundTrip tripMode={'OneWay'} onTripDataSelect={onTripDataSelect} />}
+            {selectedOption === 'RoundTrip' && <RoundTrip tripMode={'RoundTrip'} onTripDataSelect={onTripDataSelect} />}
 
             <div className="pb-[50px] pt-4 text-sm sm:text-normal sm:font-medium flex">
                 <div className="form-check form-check-inline">

@@ -1,31 +1,33 @@
 /* eslint-disable react/prop-types */
-/* eslint-disable react-hooks/exhaustive-deps */
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import FlightCard from './FlightCard';
 import { getUrlParams } from '../../utils/params';
-import './FlightList.css'
+import './FlightList.css';
 
 const FlightList = ({ filters, onMaxPriceChange }) => {
     const location = useLocation();
+    const params = getUrlParams(location);
     const [selectedButton, setSelectedButton] = useState('Cheapest Flights');
     const [flights, setFlights] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
     const [showNetFare, setShowNetFare] = useState(false);
+    const [viewLeg, setViewLeg] = useState('both'); // 'outbound', 'return', or 'both'
 
     const handleButtonClick = (buttonName) => {
         setSelectedButton(buttonName === selectedButton ? '' : buttonName);
+        
     };
 
-    useEffect(() => {
-        const fetchFlights = async () => {
-            const params = getUrlParams(location);
-            const carriers = ['6E'];
-            let allFlights = [];
+    const fetchFlights = useCallback(async () => {
+    
+        const carriers = ['6E', 'SG', 'UK', 'QP'];
+        const sessionToken = localStorage.getItem('TransactionStatus');
 
-            for (const carrier of carriers) {
-                const xmlRequest = `
+        console.log('FlightList: ',params)
+
+        const fetchCarrierFlights = async (carrier) => {
+            const xmlRequest = `
                 <flightsearchrequest>
                     <credentials>
                         <username>APIUSER</username>
@@ -39,7 +41,7 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
                     <numadults>${params.numadults}</numadults>
                     <numchildren>${params.numchildren}</numchildren>
                     <numinfants>${params.numinfants}</numinfants>
-                    <journeytype>OneWay</journeytype>
+                    <journeytype>${params.journeytype}</journeytype>
                     <prefclass>Y</prefclass>
                     <requestformat>JSON</requestformat>
                     <resultformat>JSON</resultformat>
@@ -59,23 +61,25 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
                 </flightsearchrequest>
             `.trim();
 
-                const sessionToken = localStorage.getItem('TransactionStatus');
-                const url = `https://b2b.jasyatra.com/v2dispatch.jsp?actioncode=FSAPIV4&agentid=SUPER&opid=FS000&sessiontoken=${sessionToken}&xmlorjson=${encodeURIComponent(xmlRequest)}`;
+            const url = `https://b2b.jasyatra.com/v2dispatch.jsp?actioncode=FSAPIV4&agentid=SUPER&opid=FS000&sessiontoken=${sessionToken}&xmlorjson=${encodeURIComponent(xmlRequest)}`;
 
-                try {
-                    const response = await fetch(url);
-                    const data = await response.json();
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
 
-                    const carrierFlights = data.flightsearchresponse.flightjourneys?.flatMap(journey =>
-                        journey.flightoptions?.flatMap(option => option.recommendedflight) || []
-                    ) || [];
+                console.log(data);
 
-                    allFlights = [...allFlights, ...carrierFlights];
-                } catch (error) {
-                    console.error('Error fetching flights:', error);
-                }
+                return data.flightsearchresponse.flightjourneys?.flatMap(journey =>
+                    journey.flightoptions?.flatMap(option => option.recommendedflight) || []
+                ) || [];
+            } catch (error) {
+                console.error('Error fetching flights:', error);
+                return [];
             }
+        };
 
+        try {
+            const allFlights = (await Promise.all(carriers.map(fetchCarrierFlights))).flat();
             allFlights.sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare);
 
             setFlights(allFlights);
@@ -85,16 +89,21 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
                 const maxPrice = Math.max(...allFlights.map(flight => flight.flightfare.totalbasefare));
                 onMaxPriceChange(maxPrice);
             }
-        };
+        } catch (error) {
+            console.error('Error fetching flights:', error);
+            setIsLoading(false);
+        }
+    }, [params, onMaxPriceChange]);
 
+    useEffect(() => {
         fetchFlights();
-    }, [location]);
+    }, [fetchFlights]);
 
     useEffect(() => {
         if (selectedButton === 'Cheapest Flights') {
-            setFlights([...flights].sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare));
+            setFlights(prevFlights => [...prevFlights].sort((a, b) => a.flightfare.totalbasefare - b.flightfare.totalbasefare));
         } else if (selectedButton === 'Shortest Duration') {
-            setFlights([...flights].sort((a, b) => {
+            setFlights(prevFlights => [...prevFlights].sort((a, b) => {
                 const totalDurationA = a.flightlegs?.reduce((total, leg) => total + leg.journeyduration, 0) || 0;
                 const totalDurationB = b.flightlegs?.reduce((total, leg) => total + leg.journeyduration, 0) || 0;
                 return totalDurationA - totalDurationB;
@@ -139,9 +148,11 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
                 <div className="text-left text-lg sm:text-4xl font-semibold sm:text-white">
                     Flights from {flights[0].flightlegs[0]?.origin_name || 'Unknown'} to {flights[0].flightlegs[flights[0].flightlegs.length - 1]?.destination_name || 'Unknown'}
                 </div>
-                <div className='text-white font-semibold' onClick={toggleNetFare}> {showNetFare ? 'Hide Net Fare' : 'Show Net Fare'}</div>
+                <div className='sm:text-white font-semibold' onClick={toggleNetFare}> {showNetFare ? 'Hide Net Fare' : 'Show Net Fare'}</div>
                 </div>
             )}
+
+            {params.journeytype==='RoundTrip'}
             <div className="flex items-center w-full h-[60px] bg-gray-300 rounded-xl">
                 <button
                     className={`w-1/3 h-full rounded-xl text-center ${selectedButton === 'Cheapest Flights' ? 'bg-[#06539A] text-white' : 'bg-gray-300'} hover:bg-[#06539A] hover:text-white focus:outline-none p-2`}
@@ -170,7 +181,7 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
                     </div>
                 ) : (
                     filteredFlights.map(flight => (
-                        <FlightCard key={flight.nextraflightkey} flight={flight} showNetFare ={showNetFare} />
+                        <FlightCard key={flight.nextraflightkey} flight={flight} showNetFare={showNetFare} />
                     ))
                 )}
             </div>

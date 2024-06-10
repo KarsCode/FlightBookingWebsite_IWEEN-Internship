@@ -36,6 +36,7 @@ const LandingPage = () => {
             resultformat: searchParams.get('resultformat'),
             searchtype: searchParams.get('searchtype'),
             numresults: searchParams.get('numresults'),
+            tripmode: searchParams.get('journeytype')
         };
 
         setTripData(tripData);

@@ -12,13 +12,16 @@ const airlineLogos = {
     'Indigo': '/IndiGo-Logo.png',
     'Vistara': '/Vistara-Logo.png',
     'Spicejet': '/SpiceJet-Logo.png',
+    'Akasa Air': '/Akasa-Logo.png'
     // Add other airlines and their logos here
 };
 
 const FlightCard = ({ flight,showNetFare }) => {
-    const [activeTab, setActiveTab] = useState('');
+    const [activeTab, setActiveTab] = useState(''); 
     const [open, setOpen] = useState(false);
     const [redirect, setRedirect] = useState(null);
+
+
 
     const handleTabChange = (tabName) => {
         setActiveTab(tabName);
@@ -27,6 +30,13 @@ const FlightCard = ({ flight,showNetFare }) => {
     const handleClose = () => {
         setOpen(false);
     };
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+    // Extracting query parameters
+    const numadults = urlParams.get('numadults') || '';
+    const numchildren = urlParams.get('numchildren') || '';
+    const numinfants = urlParams.get('numinfants') || '';
 
     const handleViewPrice = () => {
         const sessionToken = localStorage.getItem('TransactionStatus');
@@ -38,6 +48,9 @@ const FlightCard = ({ flight,showNetFare }) => {
             resultformat: 'jsonv2',
             sessiontoken: sessionToken,
             triptype: 'oneway',
+            numadults: numadults,
+            numchildren: numchildren,
+            numinfants: numinfants
             // Add other necessary parameters here based on flight data
         });
         const bookingUrl = `/booking?${urlParams.toString()}`;

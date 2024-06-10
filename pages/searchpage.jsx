@@ -13,6 +13,14 @@ const SearchPage = () => {
     const [redirect, setRedirect] = useState(false);
     const [tripData, setTripData] = useState(null); // State to store trip data
 
+    const adjustToLocalTimezone = (date) => {
+        if (!date) return null;
+        const offset = date.getTimezoneOffset();
+        const adjustedDate = new Date(date.getTime() - (offset * 60 * 1000));
+        return adjustedDate.toISOString().split('T')[0];
+    };
+
+
     // Function to handle icon click
     const handleIconClick = (iconName) => {
         setSelectedIcon(iconName);
@@ -42,10 +50,11 @@ const SearchPage = () => {
 
         // If all checks pass, construct the URL with search parameters
         const sessionToken = localStorage.getItem('TransactionStatus');
-        const onwardDate = tripData.selectedDepartDate.toISOString().split('T')[0];
-        const returnDate = tripData.selectedReturnDate ? tripData.selectedReturnDate.toISOString().split('T')[0] : '';
+        const onwardDate = adjustToLocalTimezone(tripData.selectedDepartDate)
+        const returnDate = tripData.selectedReturnDate ? adjustToLocalTimezone(tripData.selectedReturnDate) : '';
 
         console.log('searchpage: ',tripData.tripMode)
+        console.log(returnDate)
 
         const urlParams = new URLSearchParams({
             actioncode: 'FSAPIV4',

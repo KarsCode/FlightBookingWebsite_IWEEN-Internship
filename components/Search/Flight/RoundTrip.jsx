@@ -63,7 +63,7 @@
             ;
 
         const handleReturnDateChange = (date) => {
-
+        
             setSelectedReturnDate(date);
             handleTripDataSelect();
 
@@ -145,6 +145,7 @@
 
         const handleTripDataSelect = () => {
             // Gather trip data from state or other relevant sources
+            console.log(selectedDepartDate,selectedReturnDate)
             const tripData = {
                 selectedDepartDate,
                 selectedReturnDate,

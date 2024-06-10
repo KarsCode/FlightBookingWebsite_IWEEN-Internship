@@ -110,7 +110,7 @@ const FlightCard = ({ flight,showNetFare }) => {
                         <div className="font-semibold">
                             {flight.flightlegs[0].validatingcarriername}
                         </div>
-                        <div className="text-gray-400 text-xs text-left">
+                        <div className="text-gray-400 text-xs sm:text-left">
                             {flight.flightlegs[0].validatingcarrier}{flight.flightlegs[0].flightnumber}
                         </div>
                     </div>
@@ -121,7 +121,7 @@ const FlightCard = ({ flight,showNetFare }) => {
                     <div className="font-semibold text-xl">
                         {formatTime(flight.flightlegs[0].deptime)}
                     </div>
-                    <div className="text-gray-400 text-sm text-left">
+                    <div className="text-gray-400 text-sm sm:text-left">
                         {flight.flightlegs[0].origin_name}
                     </div>
                 </div>
@@ -141,7 +141,7 @@ const FlightCard = ({ flight,showNetFare }) => {
                     <div className="font-semibold text-xl">
                         {formatTime(lastLeg.arrtime)}
                     </div>
-                    <div className="text-gray-400 text-sm text-right">
+                    <div className="text-gray-400 text-sm sm:text-right">
                         {lastLeg.destination_name}
                     </div>
                 </div>

@@ -145,6 +145,7 @@ const LandingSearch = () => {
         const sessionToken = localStorage.getItem('TransactionStatus');
         const onwardDate = selectedDepartDate.toISOString().split('T')[0];
         const returnDate = selectedReturnDate ? selectedReturnDate.toISOString().split('T')[0] : '';
+        const journeyType = selectedReturnDate ? 'RoundTrip' : 'OneWay';
 
         const urlParams = new URLSearchParams({
             actioncode: 'FSAPIV4',
@@ -158,7 +159,7 @@ const LandingSearch = () => {
             numadults: adults,
             numchildren: children,
             numinfants: infants,
-            journeytype: 'OneWay',
+            journeytype: journeyType,
             prefclass: 'Y',
             requestformat: 'JSON',
             resultformat: 'JSON',

@@ -3,7 +3,7 @@
 const links = () => {
     return (
         <div className="flex gap-32">
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-start w-1/2">
                 <div className="font-semibold">
                     Company
                 </div>
@@ -14,7 +14,7 @@ const links = () => {
                 </div>
             </div>
     
-            <div className="flex flex-col items-start">
+            <div className="flex flex-col items-start w-1/2">
                 <div className="font-semibold">
                     Product
                 </div>

@@ -5,13 +5,11 @@ import { FaRegMoon } from 'react-icons/fa';
 // eslint-disable-next-line react/prop-types
 const Filters = ({ onFilterChange, maxPrice }) => {
 
-  console.log('Filters', maxPrice)
-
   const [selectedAirline, setSelectedAirline] = useState('');
   const [priceRange, setPriceRange] = useState([1010, maxPrice || 40000]);
   const [selectedDepartTime, setSelectedDepartTime] = useState([]);
   const [selectedArrivalTime, setSelectedArrivalTime] = useState([]);
-  const [selectedFarePolicy, setSelectedFarePolicy] = useState([]);
+  const [selectedFarePolicy, setSelectedFarePolicy] = useState(['AM/PM']);
   // eslint-disable-next-line no-unused-vars
   const [flightNumber, setFlightNumber] = useState('');
 
@@ -104,7 +102,7 @@ const Filters = ({ onFilterChange, maxPrice }) => {
       priceRange,
       selectedDepartTime,
       selectedArrivalTime,
-      // selectedFarePolicy,
+      selectedFarePolicy,
       flightNumber
     });
   }, [selectedAirline, priceRange, selectedDepartTime, selectedArrivalTime, selectedFarePolicy, flightNumber]);
@@ -166,6 +164,19 @@ const Filters = ({ onFilterChange, maxPrice }) => {
             />
             <label className='form-check-label' htmlFor='airlineVistara'>
               Akasa
+            </label>
+          </div>
+          <div className='form-check'>
+            <input
+              className='form-check-input'
+              type='checkbox'
+              value='Air India'
+              id='airlineAirIndia'
+              checked={selectedAirline === 'Air India'}
+              onChange={handleAirlineChange}
+            />
+            <label className='form-check-label' htmlFor='airlineAirIndia'>
+              Air India
             </label>
           </div>
         </div>
@@ -278,35 +289,45 @@ const Filters = ({ onFilterChange, maxPrice }) => {
       <div className='p-4 border-b border-gray-300'>
         <div className='text-md font-semibold mb-2 text-left'>Fare Policy & No. of stops</div>
         <div className='flex flex-col gap-2 text-sm'>
-          <label className='flex items-center gap-2'>
+        <label className='flex items-center gap-2'>
             <input
               type='checkbox'
-              value='Non Stop'
-              checked={selectedFarePolicy.includes('Non Stop')}
-              onChange={() => handleFarePolicyChange('Non Stop')}
+              value='NoStop'
+              checked={selectedFarePolicy.includes('NoStop')}
+              onChange={() => handleFarePolicyChange('NoStop')}
               className='h-4 w-4 border border-gray-300 rounded-md checked:bg-[#0B2A5B] checked:border-transparent focus:outline-none'
             />
-            <span>Non Stop</span>
+            <span>No Stop</span>
           </label>
           <label className='flex items-center gap-2'>
             <input
               type='checkbox'
-              value='Refundable'
-              checked={selectedFarePolicy.includes('Refundable')}
-              onChange={() => handleFarePolicyChange('Refundable')}
+              value='1Stop'
+              checked={selectedFarePolicy.includes('1Stop')}
+              onChange={() => handleFarePolicyChange('1Stop')}
               className='h-4 w-4 border border-gray-300 rounded-md checked:bg-[#0B2A5B] checked:border-transparent focus:outline-none'
             />
-            <span>Refundable</span>
+            <span>1 Stop</span>
           </label>
           <label className='flex items-center gap-2'>
             <input
               type='checkbox'
-              value='Same Day Arrival'
-              checked={selectedFarePolicy.includes('Same Day Arrival')}
-              onChange={() => handleFarePolicyChange('Same Day Arrival')}
+              value='2Stop'
+              checked={selectedFarePolicy.includes('2Stop')}
+              onChange={() => handleFarePolicyChange('2Stop')}
               className='h-4 w-4 border border-gray-300 rounded-md checked:bg-[#0B2A5B] checked:border-transparent focus:outline-none'
             />
-            <span>Same Day Arrival</span>
+            <span>2 Stop</span>
+          </label>
+          <label className='flex items-center gap-2'>
+            <input
+              type='checkbox'
+              value='AM/PM'
+              checked={selectedFarePolicy.includes('AM/PM')}
+              onChange={() => handleFarePolicyChange('AM/PM')}
+              className='h-4 w-4 border border-gray-300 rounded-md checked:bg-[#0B2A5B] checked:border-transparent focus:outline-none'
+            />
+            <span>AM/PM format</span>
           </label>
         </div>
       </div>

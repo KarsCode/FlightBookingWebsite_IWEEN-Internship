@@ -6,18 +6,10 @@ import { IoClose } from "react-icons/io5";
 import FareSummary from './ModalFiles/FareSummary';
 import { Navigate } from 'react-router-dom';
 import FareRules from './ModalFiles/FareRules';
+import airlineLogos from '../../utils/logos';
 
-// Define a mapping for airline logos
-const airlineLogos = {
-    'Indigo': '/IndiGo-Logo.png',
-    'Vistara': '/Vistara-Logo.png',
-    'Spicejet': '/SpiceJet-Logo.png',
-    'Akasa Air': '/Akasa-Logo.png'
-    // Add other airlines and their logos here
-};
-
-const FlightCard = ({ flight,showNetFare }) => {
-    const [activeTab, setActiveTab] = useState(''); 
+const FlightCard = ({ flight, showNetFare, selectedFlightSet, onTripSelect, filters }) => {
+    const [activeTab, setActiveTab] = useState('');
     const [open, setOpen] = useState(false);
     const [redirect, setRedirect] = useState(null);
 
@@ -37,24 +29,32 @@ const FlightCard = ({ flight,showNetFare }) => {
     const numadults = urlParams.get('numadults') || '';
     const numchildren = urlParams.get('numchildren') || '';
     const numinfants = urlParams.get('numinfants') || '';
+    const tripMode = urlParams.get('journeytype') || '';
 
     const handleViewPrice = () => {
-        const sessionToken = localStorage.getItem('TransactionStatus');
-        const urlParams = new URLSearchParams({
-            actioncode: 'FSTAXESV4',
-            agentid: 'JY86528',
-            cachekeyow: flight.nextraflightkey,
-            opid: 'FS000',
-            resultformat: 'jsonv2',
-            sessiontoken: sessionToken,
-            triptype: 'oneway',
-            numadults: numadults,
-            numchildren: numchildren,
-            numinfants: numinfants
-            // Add other necessary parameters here based on flight data
-        });
-        const bookingUrl = `/booking?${urlParams.toString()}`;
-        setRedirect(bookingUrl);
+        if (tripMode === 'OneWay') {
+            const sessionToken = localStorage.getItem('TransactionStatus');
+            const urlParams = new URLSearchParams({
+                actioncode: 'FSTAXESV4',
+                agentid: 'JY86528',
+                cachekeyow: flight.nextraflightkey,
+                opid: 'FS000',
+                resultformat: 'jsonv2',
+                sessiontoken: sessionToken,
+                triptype: 'oneway',
+                numadults: numadults,
+                numchildren: numchildren,
+                numinfants: numinfants
+                // Add other necessary parameters here based on flight data
+            });
+            const bookingUrl = `/booking?${urlParams.toString()}`;
+            setRedirect(bookingUrl);
+        }
+
+        if (tripMode === 'RoundTrip') {
+            console.log('Card', selectedFlightSet)
+            onTripSelect(flight, selectedFlightSet)
+        }
     };
 
     if (redirect) {
@@ -62,14 +62,26 @@ const FlightCard = ({ flight,showNetFare }) => {
     }
 
     const formatTime = (time) => {
-        const hours = Math.floor(time / 100);
-        const minutes = time % 100;
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        const formattedHours = hours % 12 || 12;
-        const formattedMinutes = minutes.toString().padStart(2, '0');
-        return `${formattedHours}:${formattedMinutes} ${ampm}`;
-    }; 
-    
+
+        console.log(time)
+
+        if (filters.selectedFarePolicy.includes('AM/PM')) {
+            const hours = Math.floor(time / 100);
+            const minutes = time % 100;
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = hours % 12 || 12;
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+            return `${formattedHours}:${formattedMinutes} ${ampm}`;
+        }
+        else{
+            const hours = Math.floor(time / 100);
+            const minutes = time % 100;
+            const formattedHours = hours.toString().padStart(2, '0');
+            const formattedMinutes = minutes.toString().padStart(2, '0');
+            return `${formattedHours}:${formattedMinutes}`;
+        }
+    };
+
     const formatDuration = (duration) => {
         if (duration < 60) {
             return `${duration} minute${duration !== 1 ? 's' : ''}`;
@@ -147,14 +159,14 @@ const FlightCard = ({ flight,showNetFare }) => {
                 </div>
 
                 {/* Fare */}
-                <div className="flex flex-col sm:pl-10">
+                <div className="flex flex-col sm:pl-10 items-center sm:items-start">
                     <div className="font-semibold text-xl text-[#06539A]">
                         {formatCurrency(flight.flightfare.totalbasefare)}
                     </div>
                     {showNetFare && (<div className="text-gray-400 text-sm text-left">
                         {formatCurrency(flight.flightfare.totalnet)}
                     </div>)}
-                    
+
                 </div>
 
                 {/* Book now */}
@@ -173,55 +185,55 @@ const FlightCard = ({ flight,showNetFare }) => {
                     </button>
 
                     <div className=''>
-                    <Dialog open={open} onClose={handleClose} className=' lexend-deca font-normal' maxWidth='md'>
-                        <DialogTitle className='bg-white pb-2'>
-                            <div className='flex gap-20 items-center justify-between'>
-                                <div className='lexend-deca font-semibold'>
-                                    Flight Details
+                        <Dialog open={open} onClose={handleClose} className=' lexend-deca font-normal' maxWidth='md'>
+                            <DialogTitle className='bg-white pb-2'>
+                                <div className='flex gap-20 items-center justify-between'>
+                                    <div className='lexend-deca font-semibold'>
+                                        Flight Details
+                                    </div>
+                                    <div className='text-gray-500' onClick={handleClose}>
+                                        <IoClose size={30} />
+                                    </div>
                                 </div>
-                                <div className='text-gray-500' onClick={handleClose}>
-                                    <IoClose size={30}/>  
+                            </DialogTitle>
+                            <DialogContent className='p-0 w-full'>
+                                <div className="flex bg-gray-200 p-2 text-sm gap-10 h-[55px] overflow-auto">
+                                    <button
+                                        className={`rounded-2xl sm:px-2 sm:py-1 px-6 focus:outline-none ${activeTab === 'FlightDetails' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
+                                        onClick={() => handleTabChange('FlightDetails')}
+                                    >
+                                        Flight Details
+                                    </button>
+                                    <button
+                                        className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'FareSummary' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
+                                        onClick={() => handleTabChange('FareSummary')}
+                                    >
+                                        Fare Summary
+                                    </button>
+                                    <button
+                                        className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'FareRules' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
+                                        onClick={() => handleTabChange('FareRules')}
+                                    >
+                                        Fare Rules
+                                    </button>
                                 </div>
-                            </div>
-                        </DialogTitle>
-                        <DialogContent className='p-0 w-full'>
-                            <div className="flex bg-gray-200 p-2 text-sm gap-10 h-[55px] overflow-auto">
-                                <button
-                                    className={`rounded-2xl sm:px-2 sm:py-1 px-6 focus:outline-none ${activeTab === 'FlightDetails' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
-                                    onClick={() => handleTabChange('FlightDetails')}
-                                >
-                                    Flight Details
-                                </button>
-                                <button
-                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'FareSummary' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
-                                    onClick={() => handleTabChange('FareSummary')}
-                                >
-                                    Fare Summary
-                                </button>
-                                <button
-                                    className={`rounded-2xl px-2 py-1 focus:outline-none ${activeTab === 'FareRules' ? 'bg-orange-500 text-white' : 'bg-white text-gray-400'}`}
-                                    onClick={() => handleTabChange('FareRules')}
-                                >
-                                    Fare Rules
-                                </button>
-                            </div>
 
-                            {/* Render content based on activeTab */}
-                            {activeTab === 'FlightDetails' && (
-                                <FlightDetails flight={flight} />
-                            )}
-                            {activeTab === 'FareSummary' && (
-                                <div>
-                                    <FareSummary flight={flight}/>
-                                </div>
-                            )}
-                            {activeTab === 'FareRules' && (
-                                <div>
-                                    <FareRules flight={flight}/>
-                                </div>
-                            )}
-                        </DialogContent>
-                    </Dialog>
+                                {/* Render content based on activeTab */}
+                                {activeTab === 'FlightDetails' && (
+                                    <FlightDetails flight={flight} />
+                                )}
+                                {activeTab === 'FareSummary' && (
+                                    <div>
+                                        <FareSummary flight={flight} />
+                                    </div>
+                                )}
+                                {activeTab === 'FareRules' && (
+                                    <div>
+                                        <FareRules flight={flight} />
+                                    </div>
+                                )}
+                            </DialogContent>
+                        </Dialog>
                     </div>
                 </div>
             </div>

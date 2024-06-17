@@ -12,7 +12,7 @@ const Header = () => {
 
   return (
     <div className=" bg-white flex font-bold pb-4 pl-2 pr-6 pt-4 gap-4 sm:pt-0 sm:pr-2 sm:pl-[6rem]">
-      <Link to="/" className="pr-4">
+      <Link to="/search" className="pr-4">
         <img src="/logo.png" width="150" height="50" alt="Logo" />
       </Link>
 

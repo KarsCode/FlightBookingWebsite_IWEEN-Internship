@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { Navigate, useLocation } from 'react-router-dom';
 import Select from 'react-select';
+import { components } from 'react-select';
 
 // eslint-disable-next-line react/prop-types
 const LandingSearch = () => {

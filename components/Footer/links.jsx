@@ -7,7 +7,7 @@ const links = () => {
                 <div className="font-semibold">
                     Company
                 </div>
-                <div className="flex flex-col font-light items-start">
+                <div className="flex flex-col font-light text-left">
                 <a href="/">Home</a>
                 <a href="/about" >About Us</a>
                 <a href="/contact" >Contact Us</a>

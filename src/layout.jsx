@@ -13,7 +13,10 @@ const Layout = ({ children }) => {
       {/* Render children components */}
       {children}
       {/* Common footer for all pages */}
-      <Footer />
+      <div className='mt-auto]'>
+        <Footer />
+      </div>
+
 
     </div>
 

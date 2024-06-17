@@ -2,14 +2,10 @@
 /* eslint-disable react/prop-types */
 import { FaPlane } from "react-icons/fa";
 import { FaRegClock } from "react-icons/fa";
+import airlineLogos from "../../../utils/logos";
 
 const FlightDetails = ({ flight }) => {
 
-    const airlineLogos = {
-        'Indigo': '/IndiGo-Logo.png',
-        'Vistara': '/Vistara-Logo.png',
-        'Spicejet': '/SpiceJet-Logo.png',
-    };
 
     const formatTime = (time) => {
         const hours = Math.floor(time / 100);

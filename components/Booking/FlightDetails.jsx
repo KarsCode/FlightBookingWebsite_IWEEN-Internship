@@ -1,43 +1,44 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
-
 import { useEffect, useState } from "react";
 import Modal from 'react-bootstrap/Modal'
+import airlineLogos from "../../utils/logos";
 
-const FlightDetails = ({ flight }) => {
-
-    const airlineLogos = {
-        'Indigo': '/IndiGo-Logo.png',
-        'Vistara': '/Vistara-Logo.png',
-        'Spicejet': '/SpiceJet-Logo.png',
-        'Akasa Air': '/Akasa-Logo.png'
-        // Add other airlines and their logos here
-    };
+const FlightDetails = ({ flight, type }) => {
 
     const departureDate = flight.flightlegs[0].depdate;
     const journeyDuration = flight.flightlegs.reduce((total, leg) => total + leg.journeyduration, 0);
     const stopoverCount = flight.flightlegs.length - 1;
     const stopoverText = stopoverCount === 0 ? 'Non-stop' : `${stopoverCount} Stop${stopoverCount > 1 ? 's' : ''}`;
-    const [opid, setOpid] = useState('');
-    const [flightkey, setFlightkey] = useState('')
     const [showModal, setShowModal] = useState(false);
     const [fareRules, setFareRules] = useState(null);
 
-    // Fetch opid from URL parameter
+    // Fetch opid and flightkey from URL parameter
+    const [opid, setOpid] = useState('');
+    const [flightkey, setFlightkey] = useState('');
+
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
         const opidParam = params.get('opid');
+        var flightkeyParam;
+        if (type === 'outbound') {
+            flightkeyParam = params.get('cachekeyow');
+        }
+        else {
+            flightkeyParam = params.get('cachekeytw');
+        }
+
+
         if (opidParam) {
             setOpid(opidParam);
         }
-        const flightkeyParam = params.get('cachekeyow');
         if (flightkeyParam) {
-            setFlightkey(flightkeyParam)
+            setFlightkey(flightkeyParam);
         }
     }, []);
 
     const openModal = () => setShowModal(true);
     const closeModal = () => setShowModal(false);
-
 
     const formatDate = (dateString) => {
         const options = { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' };
@@ -91,10 +92,9 @@ const FlightDetails = ({ flight }) => {
         return `${hours}h ${minutes}min`;
     };
 
-
     const handleViewFareRules = async () => {
+        console.log(flight)
         const sessionToken = localStorage.getItem('TransactionStatus'); // Retrieve session token from localStorage
-
         // Construct API request parameters
         const params = new URLSearchParams({
             actioncode: 'GETFARERULES',
@@ -115,9 +115,7 @@ const FlightDetails = ({ flight }) => {
         try {
             const response = await fetch(apiUrl);
             const data = await response.json();
-            console.log('Fare rules:', data);
-            setFareRules(data.farerules_html[0]); // Log the received information
-            console.log(fareRules)
+            setFareRules(data.farerules_html[0]);
         } catch (error) {
             console.error('Error fetching fare rules:', error);
         }
@@ -132,7 +130,7 @@ const FlightDetails = ({ flight }) => {
     };
 
     if (!flight) {
-        return <div className="text-white">Loading</div>;
+        return <div className="">Loading</div>;
     }
 
     return (
@@ -156,8 +154,18 @@ const FlightDetails = ({ flight }) => {
                             <Modal.Title>Fare Rules</Modal.Title>
                         </Modal.Header>
                         <Modal.Body>
+                            {
+                                !fareRules && (
+
+                                    <div className='flex items-center justify-center h-20 py-36 sm:py-0 bg-white sm:bg-none'>
+                                        <div className='loader '></div>
+                                    </div>
+                                )
+                            }
+
+
                             {fareRules && (
-                                <div className="overflow-auto " dangerouslySetInnerHTML={{ __html: JSON.parse(fareRules).html }} />
+                                <div className="overflow-auto" dangerouslySetInnerHTML={{ __html: JSON.parse(fareRules).html }} />
                             )}
                         </Modal.Body>
                     </Modal>
@@ -193,7 +201,7 @@ const FlightDetails = ({ flight }) => {
                         <div className="flex flex-col text-left">
                             <div className="flex items-center gap-2">
                                 <div className="font-semibold">
-                                    {formatTime(leg.deptime)} - {leg.origin_name} {leg.depterminal} Terminal: {leg.depterminal}
+                                    {formatTime(leg.deptime)} - {leg.origin_name}   {leg.depterminal}
                                 </div>
                                 <div className="text-gray-400">
                                     | {formatDate(leg.depdate)}
@@ -206,24 +214,20 @@ const FlightDetails = ({ flight }) => {
 
                             <div className="flex items-center gap-2">
                                 <div className="font-semibold">
-                                    {formatTime(leg.arrtime)} - {leg.destination_name} - Terminal: {leg.arrterminal}
+                                    {formatTime(leg.arrtime)} - {leg.destination_name}  {leg.arrterminal}
                                 </div>
                                 <div className="text-gray-400">
                                     | {formatDate(leg.arrdate)}
                                 </div>
                             </div>
-
                         </div>
 
                         <div className="flex gap-3 pt-4">
-                            
                             <div className="text-gray-400 border-2 border-gray-300 rounded-md">
                                 <div className="p-1">
                                     Check In: {parseBaggageWeight(leg.bagweight)}
                                 </div>
                             </div>
-                           
-
                         </div>
 
                         {index < flight.flightlegs.length - 1 && (
@@ -233,7 +237,6 @@ const FlightDetails = ({ flight }) => {
                                 </div>
                             </div>
                         )}
-
                     </div>
                 </div>
             ))}
@@ -241,4 +244,4 @@ const FlightDetails = ({ flight }) => {
     )
 }
 
-export default FlightDetails
+export default FlightDetails;

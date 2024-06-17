@@ -3,6 +3,7 @@ import './searchpage.css'
 import Header from '../components/header'
 import Navbar from '../components/Search/Navbar';
 import SearchModal from '../components/Search/SearchModal'
+import SearchOffers from '../components/Search/SearchOffers'
 import Footer from '../components/Footer/footer'
 import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
@@ -12,6 +13,7 @@ const SearchPage = () => {
     const [selectedIcon, setSelectedIcon] = useState('flight');
     const [redirect, setRedirect] = useState(false);
     const [tripData, setTripData] = useState(null); // State to store trip data
+    const [searchType, setSearchType] = useState('normal'); // State to store the search type
 
     const adjustToLocalTimezone = (date) => {
         if (!date) return null;
@@ -19,7 +21,6 @@ const SearchPage = () => {
         const adjustedDate = new Date(date.getTime() - (offset * 60 * 1000));
         return adjustedDate.toISOString().split('T')[0];
     };
-
 
     // Function to handle icon click
     const handleIconClick = (iconName) => {
@@ -32,12 +33,25 @@ const SearchPage = () => {
         setTripData(tripData);
     };
 
+    // Function to handle search type change
+    const handleSearchTypeChange = (type) => {
+        setSearchType(type);
+    };
+
     // Function to handle the search action
     const handleSearch = () => {
         // Check if required fields are missing
-        if (!tripData || !tripData.departCity || !tripData.destinationCity) {
-            window.alert("Please fill in all required fields: Depart City, Arrival City, and Depart Date");
-            return;
+        if (tripData.tripMode === 'OneWay') {
+            if (!tripData || !tripData.departCity || !tripData.destinationCity) {
+                window.alert("Please fill in all required fields: Depart City, Arrival City, and Depart Date");
+                return;
+            }
+        }
+        if (tripData.tripMode === 'RoundTrip') {
+            if (!tripData || !tripData.departCity || !tripData.destinationCity || !tripData.selectedReturnDate) {
+                window.alert("Please fill in all required fields: Depart City, Arrival City, Depart Date, and Return Date");
+                return;
+            }
         }
 
         // Check if Depart City and Arrival City are the same
@@ -46,16 +60,10 @@ const SearchPage = () => {
             return;
         }
 
-        console.log('Trip Mode',tripData.tripMode)
-
         // If all checks pass, construct the URL with search parameters
         const sessionToken = localStorage.getItem('TransactionStatus');
         const onwardDate = adjustToLocalTimezone(tripData.selectedDepartDate)
         const returnDate = tripData.selectedReturnDate ? adjustToLocalTimezone(tripData.selectedReturnDate) : '';
-
-        console.log('searchpage: ',tripData.tripMode)
-        console.log(returnDate)
-
         const urlParams = new URLSearchParams({
             actioncode: 'FSAPIV4',
             agentid: 'SUPER',
@@ -72,7 +80,7 @@ const SearchPage = () => {
             prefclass: 'Y',
             requestformat: 'JSON',
             resultformat: 'JSON',
-            searchtype: 'normal',
+            searchtype: searchType,  // Add the search type here
             numresults: 100
         });
 
@@ -88,28 +96,29 @@ const SearchPage = () => {
 
     return (
         <div>
-            {/* Content on top of the gradient */}
-            <div className="content font-normal">
-                <div className="">
-                    <Header />
-                </div>
-                <div className="flex flex-col items-center">
+            <div className='content'>
+                <div className="flex flex-col items-center p-2">
                     <div className="sm:absolute flex w-full justify-center pt-10 sm:px-4 sm:pt-12 z-3">
                         <Navbar handleIconClick={handleIconClick} />
                     </div>
                     <div className="w-full flex flex-col sm:flex-row justify-center sm:mt-[110px] sm:z-2">
-                        <SearchModal selectedIcon={selectedIcon} onTripDataSelect={handleTripDataSelect} />
+                        <SearchModal
+                            selectedIcon={selectedIcon}
+                            onTripDataSelect={handleTripDataSelect}
+                            onSearchTypeChange={handleSearchTypeChange}
+                        />
                     </div>
-                    <div className="w-1/3 text-xl font-bold sm:z-3 p-2 sm:mt-[-20px] bg-[#E0621A] text-white rounded-full transition duration-300 ease-in-out transform hover:scale-105">
-                        <button className="relative" onClick={handleSearch}>
+                    <div className="w-1/3 text-xl font-bold sm:z-3 p-2 sm:mt-[-20px] bg-[#E0621A] text-white rounded-full transition duration-300 ease-in-out">
+                        <button
+                            className="w-full"
+                            onClick={handleSearch}
+                        >
                             Search
                         </button>
                     </div>
                 </div>
-                <div className="pt-48">
-                    <Footer />
-                </div>
             </div>
+
         </div>
     );
 };

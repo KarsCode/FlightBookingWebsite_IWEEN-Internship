@@ -53,7 +53,8 @@ const LandingPage = () => {
         priceRange: [1010, maxPrice],
         selectedDepartTime: '',
         selectedArrivalTime: '',
-        flightNumber: ''
+        flightNumber: '',
+        selectedFarePolicy: ''
     });
 
     const handleFilterChange = (newFilters) => {
@@ -83,7 +84,7 @@ const LandingPage = () => {
             </div>
             <button
                 onClick={scrollToTop}
-                className='fixed bottom-10 right-4 p-3 bg-[#06539A] border-3 border-orange-500 text-white rounded-full shadow-xl hover:bg-orange-500 hover:border-[#06539A] transition duration-400'
+                className='fixed sm:bottom-10 top-20 sm:top-[88%] right-4 p-3 bg-[#06539A] border-3 border-orange-500 text-white rounded-full shadow-xl hover:bg-orange-500 hover:border-[#06539A] transition duration-400'
                 style={{ zIndex: 1000 }} // Ensures the button is always on top
             >
                 <FaArrowUp size={20} />

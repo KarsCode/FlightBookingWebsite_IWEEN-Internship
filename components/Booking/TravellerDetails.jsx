@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
+import PhoneInput from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
 
 const TravellerDetails = ({
     mobileNumber,
@@ -78,6 +80,7 @@ const TravellerDetails = ({
                             <option value="Mr.">Mr.</option>
                             <option value="Ms.">Ms.</option>
                             <option value="Mrs.">Mrs.</option>
+                            <option value="Mstr.">Mstr.</option>
                         </Form.Select>
                     </div>
                     <div className='w-1/3'>
@@ -118,19 +121,18 @@ const TravellerDetails = ({
                 <div className='p-2 text-xl font-semibold border-b-2 border-gray-300'>
                     Traveller Details
                 </div>
-                <div className='text-gray-400 flex flex-col'>
+                <div className='text-gray-400 flex flex-col'> 
                     Contact Information (Your ticket and flight info will be sent here)
-                    <div className='flex gap-4 pt-3'>
-                        <div>
-                            <InputGroup className="mb-3 h-full">
-                                <Form.Control
-                                    placeholder="Mobile Number"
-                                    aria-label="MobileNumber"
-                                    aria-describedby="MobileNumber"
-                                    value={mobileNumber}
-                                    onChange={(e) => setMobileNumber(e.target.value)}
-                                />
-                            </InputGroup>
+                    <div className='flex flex-col sm:flex-row gap-4 pt-3'>
+                        <div className='lexend deca'>
+                            <PhoneInput
+                                country={'in'}
+                                value={mobileNumber}
+                                onChange={phone => setMobileNumber(phone)}  
+                                inputStyle={{ width: '100%', height:'60px' }}
+                                className ="lexend-deca"
+                                
+                            />
                         </div>
                         <div>
                             <InputGroup className="mb-3 h-full">
@@ -140,6 +142,7 @@ const TravellerDetails = ({
                                     aria-describedby="EmailId"
                                     value={emailAddress}
                                     onChange={(e) => setEmailAddress(e.target.value)}
+                                    className='h-[60px]'
                                 />
                             </InputGroup>
                         </div>

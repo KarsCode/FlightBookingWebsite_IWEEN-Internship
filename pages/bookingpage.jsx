@@ -16,6 +16,9 @@ const BookingPage = () => {
         const agentid = params.get('agentid');
         const cachekeyow = params.get('cachekeyow');
         const opid = params.get('opid');
+        const triptype = params.get('triptype')
+
+        // Construct URLSearchParams with required parameters
         const urlParams = new URLSearchParams({
           actioncode: actioncode,
           agentid: agentid,
@@ -23,9 +26,19 @@ const BookingPage = () => {
           opid: 'FS000',
           resultformat: 'jsonv2',
           sessiontoken: sessionToken,
-          triptype: 'oneway',
+          triptype: triptype,
         });
+
+        // Conditionally add cachekeytw if it exists
+        const cachekeytw = params.get('cachekeytw');
+        if (cachekeytw) {
+          urlParams.append('cachekeytw', cachekeytw);
+        }
+
+        // Construct the API URL with URLSearchParams
         const apiUrl = `https://b2b.jasyatra.com/v2dispatch.jsp?${urlParams.toString()}`;
+
+        // Fetch data from the API
         const response = await fetch(apiUrl);
         const data = await response.json();
         setFlightData(data.NextraPricingResponseV4);
@@ -40,9 +53,9 @@ const BookingPage = () => {
 
   return (
     <div className='relative bg-custom-gradient h-full'>
-        <div>
-          <Booking flightData ={flightData}/>
-        </div>
+      <div>
+        <Booking flightData={flightData} />
+      </div>
     </div>
   );
 };

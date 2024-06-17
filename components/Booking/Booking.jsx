@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-
 import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import FlightDetails from './FlightDetails';
@@ -29,6 +28,9 @@ const Booking = ({ flightData }) => {
     const [selectedPaymentOption, setSelectedPaymentOption] = useState('creditdebit');
     const [termsChecked, setTermsChecked] = useState(false);
     const [detailformValidated, setDetailFormValidated] = useState(false);
+    const [totalMealCost, setTotalMealCost] = useState(0);
+
+    console.log(totalMealCost)
 
     // Handlers and functions
     const handlePromoCodeChange = (e) => {
@@ -48,28 +50,33 @@ const Booking = ({ flightData }) => {
             alert('Please agree to the Terms and Conditions.');
             return;
         }
-        if(!detailformValidated)
-            {
-                alert('Please fill in all fields.');
-                return;
-            }
+        if (!detailformValidated) {
+            alert('Please fill in all fields.');
+            return;
+        }
         console.log('Booking submitted!');
     };
 
     if (!flightData) {
         return (
-            <div className="text-white">
-                Loading
+            <div className='flex justify-center py-36 sm:py-0 sm:pb-20 bg-white sm:bg-none'>
+                <div className='loader sm:mt-80 '></div>
             </div>
         );
     }
 
-    const flight = flightData.flightjourneys[0].flightoptions[0].recommendedflight[0];
+    let outboundFlight = flightData.flightjourneys[0].flightoptions[0].recommendedflight[0];
+    let returnFlight = null;
+
+    if (flightData.flightjourneys.length === 2) {
+        returnFlight = flightData.flightjourneys[1].flightoptions[0].recommendedflight[0];
+    }
 
     return (
         <div className="flex sm:flex-row flex-col pt-20 pb-10 sm:pl-24 gap-10">
             <div className="w-full sm:w-2/3 flex flex-col gap-8 sm:p-2 bg-white rounded-md">
-                <FlightDetails flight={flight} />
+                <FlightDetails flight={outboundFlight} type='outbound' />
+                {returnFlight && <FlightDetails flight={returnFlight} type='inbound' />}
                 <TravelInsurance insuranceOption={insuranceOption} setInsuranceOption={setInsuranceOption} />
                 <ImportantInformation />
                 <HeroSection />
@@ -93,7 +100,7 @@ const Booking = ({ flightData }) => {
                     gstPhoneNumber={gstPhoneNumber}
                     setGstPhoneNumber={setGstPhoneNumber}
                 />
-                <AddOns />
+                {<AddOns flightData ={flightData} setTotalMealMainCost={setTotalMealCost} />}
                 <PaymentOptions selectedPaymentOption={selectedPaymentOption} handlePaymentOptionSelect={handlePaymentOptionSelect} />
 
                 <div>
@@ -109,7 +116,9 @@ const Booking = ({ flightData }) => {
 
                         <div className="flex flex-col sm:flex-row items-center gap-4">
                             <div className="text-3xl font-semibold">
-                                Rs. {flightData.flightjourneys[0].flightoptions[0].recommendedflight[0].flightfare.totalnet}
+                                Rs. {flightData.flightjourneys[0].flightoptions[0].recommendedflight[0].flightfare.totalnet +
+                                    (flightData.flightjourneys.length === 2 ? flightData.flightjourneys[1].flightoptions[0].recommendedflight[0].flightfare.totalnet : 0)
+                                    + (totalMealCost? totalMealCost : 0)}
                             </div>
                             <div>
                                 <button
@@ -125,7 +134,7 @@ const Booking = ({ flightData }) => {
                 </div>
             </div>
             <div className='flex flex-col sm:w-1/3 gap-8 sm:pr-10'>
-                <FareSummary flight={flight} />
+                <FareSummary outboundFlight={outboundFlight} returnFlight={returnFlight} totalMealCost ={totalMealCost} />
                 <Cancellation />
                 <ApplyPromoCode promoCode={promoCode} handlePromoCodeChange={handlePromoCodeChange} handleApplyPromoCode={handleApplyPromoCode} />
             </div>

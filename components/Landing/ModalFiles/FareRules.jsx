@@ -10,6 +10,7 @@ const FareRules = ({ flight }) => {
         'Spicejet': '/SpiceJet-Logo.png',
         // Add other airlines and their logos here
     };
+    
     return (
         <div className='border-2 shadow-md rounded-xl p-4 m-4'>
             <div className='flex flex-col'>

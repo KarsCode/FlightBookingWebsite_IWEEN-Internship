@@ -3,7 +3,7 @@ import Links from '../Footer/links';
 
 const Footer = () => {
   return (
-    <div className='mt-auto p-5 sm:pt-10 sm:px-10 bg-[#D8E2EE]'>
+    <div className='mb-auto p-5 sm:pt-10 sm:px-10 bg-[#D8E2EE]'>
       <div className='flex flex-col sm:flex-row sm:justify-between border-b-2 border-b-grey-400'>
         <div className='pb-5 sm:w-3/5 sm:pb-0'>
           <Info />

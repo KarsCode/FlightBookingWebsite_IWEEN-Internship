@@ -340,7 +340,7 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
                             </div>
                             <div className='bg-white rounded-lg flex flex-col p-3'>
                                 <div className='text-gray-400 sm:text-left'>
-                                    Deaprt {trip0.flightlegs[0]?.validatingcarriername}
+                                    Depart - {trip0.flightlegs[0]?.validatingcarriername}
                                 </div>
                                 <div className='flex sm:flex-row flex-col pt-2 items-center justify-center'>
                                     <div>
@@ -374,7 +374,7 @@ const FlightList = ({ filters, onMaxPriceChange }) => {
                             </div>
                             <div className='bg-white rounded-lg flex flex-col p-3'>
                                 <div className='text-gray-400 sm:text-left'>
-                                    Deaprt {trip1.flightlegs[0]?.validatingcarriername}
+                                    Return - {trip1.flightlegs[0]?.validatingcarriername}
                                 </div>
                                 <div className='flex sm:flex-row flex-col pt-2 items-center justify-center'>
                                     <div>

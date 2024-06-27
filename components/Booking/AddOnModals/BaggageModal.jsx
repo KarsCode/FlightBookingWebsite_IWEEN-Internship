@@ -1,12 +1,11 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from 'react';
 
-const MealModal = ({ content, flightlegs, onSave, initialSelectedMeals }) => {
+const BaggageModal = ({ content, onSave, flightlegs, initialSelectedBaggage }) => {
     const [selectedLeg, setSelectedLeg] = useState(0);
     const [travellers, setTravellers] = useState([]);
-    const [selectedMeals, setSelectedMeals] = useState(initialSelectedMeals || {}); // Initialize with props
-
-    const [selectedTraveller, setSelectedTraveller] = useState(0); // To track the currently selected traveller
+    const [selectedBaggages, setSelectedBaggages] = useState(initialSelectedBaggage || {});
+    const [selectedTraveller, setSelectedTraveller] = useState(null);
 
     useEffect(() => {
         const params = new URLSearchParams(window.location.search);
@@ -38,39 +37,36 @@ const MealModal = ({ content, flightlegs, onSave, initialSelectedMeals }) => {
         setSelectedTraveller(traveller);
     };
 
-    const handleMealSelect = (meal) => {
+    const handleBaggageSelect = (baggage) => {
         if (!selectedTraveller) return;
+
+        // Remove any existing baggage for the same traveller and leg
         const key = `${selectedLeg}-${selectedTraveller.type}-${selectedTraveller.id}`;
-        setSelectedMeals(prevState => {
-            const existingMeals = prevState[key] || [];
-            return {
-                ...prevState,
-                [key]: [...existingMeals, meal]
-            };
-        });
+        const updatedBaggage = [baggage]; // Only allow one baggage selection
+        setSelectedBaggages(prevState => ({
+            ...prevState,
+            [key]: updatedBaggage
+        }));
     };
 
-    const handleMealRemove = (traveller, mealIndex) => {
+    const handleBaggageRemove = (traveller) => {
         const key = `${selectedLeg}-${traveller.type}-${traveller.id}`;
-        setSelectedMeals(prevState => {
-            const existingMeals = prevState[key] || [];
-            const updatedMeals = existingMeals.filter((_, index) => index !== mealIndex);
-            return {
-                ...prevState,
-                [key]: updatedMeals
-            };
+        setSelectedBaggages(prevState => {
+            const newState = { ...prevState };
+            delete newState[key];
+            return newState;
         });
     };
 
-    const mealOptions = content.list?.CarrierSSR?.filter(item => item.ssrtype === 'meal') || [];
+    const baggageOptions = content.list?.CarrierSSR?.filter(item => item.ssrtype === 'baggage') || [];
 
-    const totalCost = Object.values(selectedMeals).flat().reduce((sum, meal) => sum + meal.chargeableamount, 0);
+    const totalCost = Object.values(selectedBaggages).flat().reduce((sum, baggage) => sum + baggage.chargeableamount, 0);
 
-    const handleSaveMeals = () => {
+    const handleSaveBaggages = () => {
         // Calculate total cost
-        const totalCost = Object.values(selectedMeals).flat().reduce((sum, meal) => sum + meal.chargeableamount, 0);
-        // Call onSave prop to pass back selected meals and total cost to parent component
-        onSave(selectedMeals, totalCost);
+        const totalCost = Object.values(selectedBaggages).flat().reduce((sum, baggage) => sum + baggage.chargeableamount, 0);
+        // Call onSave prop to pass back selected baggages and total cost to parent component
+        onSave(selectedBaggages, totalCost);
     };
 
     return (
@@ -80,8 +76,7 @@ const MealModal = ({ content, flightlegs, onSave, initialSelectedMeals }) => {
                     {flightlegs.map((leg, index) => (
                         <div
                             key={index}
-                            className={`font-semibold text-xl cursor-pointer p-2 ${selectedLeg === index ? 'bg-orange-100 underline underline-offset-8 decoration-orange-600' : ''
-                                }`}
+                            className={`font-semibold text-xl cursor-pointer p-2 ${selectedLeg === index ? 'bg-orange-100 underline underline-offset-8 decoration-orange-600' : ''}`}
                             onClick={() => handleLegSelect(index)}
                         >
                             {leg.origin} - {leg.destination}
@@ -90,10 +85,9 @@ const MealModal = ({ content, flightlegs, onSave, initialSelectedMeals }) => {
                 </div>
 
                 <div className='flex flex-col gap-2 pt-10'>
-
                     {travellers.map((traveller, index) => {
                         const key = `${selectedLeg}-${traveller.type}-${traveller.id}`;
-                        const selectedMealList = selectedMeals[key] || [];
+                        const selectedBaggageList = selectedBaggages[key] || [];
                         return (
                             <div key={index} className={`border-2 rounded-md border-orange-400 sm:w-1/4 ${selectedTraveller?.id === traveller.id && selectedTraveller?.type === traveller.type ? 'bg-orange-100' : ''}`} onClick={() => handleTravellerSelect(traveller)}>
                                 <div className='p-6 flex flex-col'>
@@ -101,20 +95,20 @@ const MealModal = ({ content, flightlegs, onSave, initialSelectedMeals }) => {
                                         {traveller.type} {traveller.id}
                                     </div>
                                     <div className='text-gray-400'>
-                                        {selectedMealList.length > 0 ? (
-                                            selectedMealList.map((meal, mealIndex) => (
-                                                <div key={mealIndex} className='flex justify-between items-center'>
-                                                    <div className='border-b-2 pt-2'>{meal.ssrname}</div>
+                                        {selectedBaggageList.length > 0 ? (
+                                            selectedBaggageList.map((baggage, baggageIndex) => (
+                                                <div key={baggageIndex} className='flex justify-between items-center'>
+                                                    <div className='border-b-2 pt-2'>{baggage.ssrname}</div>
                                                     <button
                                                         className='bg-red-500 text-white p-1 rounded text-xs'
-                                                        onClick={() => handleMealRemove(traveller, mealIndex)}
+                                                        onClick={() => handleBaggageRemove(traveller)}
                                                     >
                                                         Remove
                                                     </button>
                                                 </div>
                                             ))
                                         ) : (
-                                            'Select Meal'
+                                            'Select baggage'
                                         )}
                                     </div>
                                 </div>
@@ -124,18 +118,18 @@ const MealModal = ({ content, flightlegs, onSave, initialSelectedMeals }) => {
                 </div>
 
                 <div className='flex flex-wrap gap-4 pt-10'>
-                    {mealOptions.map((meal, index) => (
-                        <div key={index} className={`border-2 rounded-md border-blue-400 p-4 sm:w-1/3 `}>
+                    {baggageOptions.map((baggage, index) => (
+                        <div key={index} className={`border-2 rounded-md border-blue-400 p-4 `}>
                             <div className='flex gap-4 items-center'>
                                 <div>
-                                    <img src={meal.ImgUrl} alt={meal.ssrname} className='w-16 h-16' />
+                                    <img src={baggage.ImgUrl} alt={baggage.ssrname} className='w-16 h-16' />
                                 </div>
                                 <div className='flex flex-col gap-6'>
-                                    <div>{meal.ssrname}</div>
-                                    <div> Rs. {meal.chargeableamount}</div>
+                                    <div>{baggage.ssrname}</div>
+                                    <div> Rs. {baggage.chargeableamount}</div>
                                 </div>
                                 <div className='bg-orange-500 rounded-md flex items-center'>
-                                    <button className='p-2' onClick={() => handleMealSelect(meal)}>Add</button>
+                                    <button className='p-2' onClick={() => handleBaggageSelect(baggage)}>Add</button>
                                 </div>
                             </div>
                         </div>
@@ -143,14 +137,14 @@ const MealModal = ({ content, flightlegs, onSave, initialSelectedMeals }) => {
                 </div>
 
                 <div className='pt-10'>
-                    <div className='font-semibold text-xl'>Total Meal Cost: Rs. {totalCost}</div>
+                    <div className='font-semibold text-xl'>Total Baggage Cost: Rs. {totalCost}</div>
                 </div>
                 <div className='pt-4 ml-auto'>
-                    <button className='bg-blue-500 text-white px-10 py-2 rounded' onClick={handleSaveMeals}>Save</button>
+                    <button className='bg-blue-500 text-white px-10 py-2 rounded' onClick={handleSaveBaggages}>Save</button>
                 </div>
             </div>
         </div>
     );
 };
 
-export default MealModal;
+export default BaggageModal;

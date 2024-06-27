@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
 import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
@@ -29,6 +30,7 @@ const Booking = ({ flightData }) => {
     const [termsChecked, setTermsChecked] = useState(false);
     const [detailformValidated, setDetailFormValidated] = useState(false);
     const [totalMealCost, setTotalMealCost] = useState(0);
+    const [totalBaggageCost, setTotalBaggageCost] = useState(0);
 
     console.log(totalMealCost)
 
@@ -100,7 +102,7 @@ const Booking = ({ flightData }) => {
                     gstPhoneNumber={gstPhoneNumber}
                     setGstPhoneNumber={setGstPhoneNumber}
                 />
-                {<AddOns flightData ={flightData} setTotalMealMainCost={setTotalMealCost} />}
+                {<AddOns flightData ={flightData} setTotalMealMainCost={setTotalMealCost} setTotalBaggageMainCost={setTotalBaggageCost} />}
                 <PaymentOptions selectedPaymentOption={selectedPaymentOption} handlePaymentOptionSelect={handlePaymentOptionSelect} />
 
                 <div>
@@ -116,9 +118,9 @@ const Booking = ({ flightData }) => {
 
                         <div className="flex flex-col sm:flex-row items-center gap-4">
                             <div className="text-3xl font-semibold">
-                                Rs. {flightData.flightjourneys[0].flightoptions[0].recommendedflight[0].flightfare.totalnet +
+                                Rs. {(flightData.flightjourneys[0].flightoptions[0].recommendedflight[0].flightfare.totalnet +
                                     (flightData.flightjourneys.length === 2 ? flightData.flightjourneys[1].flightoptions[0].recommendedflight[0].flightfare.totalnet : 0)
-                                    + (totalMealCost? totalMealCost : 0)}
+                                    + (totalMealCost? totalMealCost : 0)).toFixed(2)}
                             </div>
                             <div>
                                 <button

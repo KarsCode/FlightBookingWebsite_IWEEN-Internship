@@ -6,8 +6,9 @@ import MealModal from "./AddOnModals/MealModal";
 import { SiApachecouchdb } from "react-icons/si";
 import { GiBowlOfRice } from "react-icons/gi";
 import { MdLuggage } from "react-icons/md";
+import BaggageModal from './AddOnModals/BaggageModal';
 
-const AddOns = ({ flightData, setTotalMealMainCost }) => {
+const AddOns = ({ flightData, setTotalMealMainCost, setTotalBaggageMainCost }) => {
     const [opid, setOpid] = useState('');
     const [sessionToken, setSessionToken] = useState('');
     const [showMealModal, setShowMealModal] = useState(false);
@@ -15,6 +16,11 @@ const AddOns = ({ flightData, setTotalMealMainCost }) => {
     const [modalContent, setModalContent] = useState('');
     const [selectedMeals, setSelectedMeals] = useState({}); // To store the selected meals
     const [totalMealCost, setTotalMealCost] = useState(0);
+    const [selectedBaggage, setSelectedBaggage] = useState({});
+    const [totalBaggageCost, setTotalBaggageCost] = useState(0);
+    const [seatLayout, setSeatLayout] = useState(null);
+    const [loadingSeatLayout, setLoadingSeatLayout] = useState(false);
+
 
     useState(() => {
         const params = new URLSearchParams(window.location.search);
@@ -74,10 +80,44 @@ const AddOns = ({ flightData, setTotalMealMainCost }) => {
             const response = await fetch(fullUrl);
             const data = await response.json();
             console.log('API response for baggage:', data);
-            setModalContent(data.Result); // Set modal content based on API response
+            setModalContent(data.ApiStatus.Result); // Set modal content based on API response
 
         } catch (error) {
             console.error('Error fetching baggage data:', error);
+        }
+    };
+
+    const handleSeatSelect= async () => {
+        if (seatLayout) {
+            console.log('Using cached seat layout:', seatLayout);
+            return;
+        }
+
+        const apiUrl = 'https://b2b.jasyatra.com/v2dispatch.jsp';
+
+        const params = new URLSearchParams({
+            actioncode: 'GETSEATLAYOUTV4',
+            agentid: 'JY86528',
+            domint: 'domestic',
+            opid: 'FS000',
+            resultformat: 'JSON',
+            selectedflight: flightData.bookingkey,
+            sessiontoken: sessionToken,
+            triptype: 'onward'
+        });
+
+        const fullUrl = `${apiUrl}?${params.toString()}`;
+
+        try {
+            setLoadingSeatLayout(true);
+            const response = await fetch(fullUrl);
+            const data = await response.json();
+            console.log('API response for seat layout:', data);
+            setSeatLayout(data.Root.Result);
+        } catch (error) {
+            console.error('Error fetching seat layout:', error);
+        } finally {
+            setLoadingSeatLayout(false);
         }
     };
 
@@ -90,6 +130,13 @@ const AddOns = ({ flightData, setTotalMealMainCost }) => {
 
         setShowMealModal(false);
         setModalContent(''); // Reset modal content
+    };
+
+    const handleSaveBaggage = (baggages, totalCost) => {
+        setSelectedBaggage(baggages);
+        setTotalBaggageCost(totalCost);
+        setShowBaggageModal(false);
+        setModalContent('');
     };
 
     const closeMealModal = () => {
@@ -110,7 +157,7 @@ const AddOns = ({ flightData, setTotalMealMainCost }) => {
             <div className='flex flex-col sm:flex-row gap-4 items-center'>
                 {flightData.flightjourneys[0].flightoptions[0].recommendedflight[0].seatmapavailable === 'true' &&
                     <div className='border-2 border-blue-400 flex justify-center rounded-md'>
-                        <div className='p-3 flex items-center justify-around gap-4'>
+                        <div className='p-3 flex items-center justify-around gap-4 cursor-pointer' onClick={handleSeatSelect}>
                             <SiApachecouchdb className='text-orange-500' size={30} />
                             Seat Selection
                         </div>
@@ -158,7 +205,13 @@ const AddOns = ({ flightData, setTotalMealMainCost }) => {
                     <Modal.Title className='font-bold'>Baggage</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <p>{modalContent}</p>
+                    <BaggageModal
+                        content={modalContent}
+                        flightlegs={flightData.flightjourneys[0].flightoptions[0].recommendedflight[0].flightlegs}
+                        onSave={handleSaveBaggage} // Pass the callback to save meals
+                        initialSelectedMeals={selectedBaggage} // Pass the initial selected meals
+                        setTotalMealCost={setTotalBaggageCost} // Pass the function to update total meal cost
+                    />
                 </Modal.Body>
             </Modal>
         </div>

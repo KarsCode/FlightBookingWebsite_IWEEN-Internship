@@ -12,7 +12,7 @@ Harnesses the power of [SWC](https://swc.rs/) for even faster refresh speeds, pe
 
 ---
 
-## Internship Project: Test Page
+## Internship Project: Flight Booking System
 
 During my internship, I developed a highly interactive and performance-optimized test page that showcases advanced web development techniques. Here's a breakdown of the  work I accomplished:
 
